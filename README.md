@@ -38,7 +38,7 @@ Code:
 
 ## Basic Usage
 
-### Finding a Estimate
+### Finding a Estimates
 
 We do the following:
 * Define the pdf or cdf.
