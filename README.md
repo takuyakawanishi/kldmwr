@@ -76,9 +76,7 @@ We do the following:
     #              x: array([-0.11747087,  0.60645557]))
 
 
-
 #### ZGE (Zero-boundary Galerkin Estimator), or JMMPSE (Jiang's modified MPS Estimator)
-
 
     import kldmwr.univar
     import scipy.stats
@@ -114,5 +112,5 @@ We do the following:
     # [-0.11059383  0.80750186]
 
 
-## Advanced Usage
+### Advanced Usage
 
