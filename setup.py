@@ -12,5 +12,5 @@ setup(
              'maximum spacings, Kullback-Leibler divergence',
     license='MIT',
     packages=find_packages(),
-    install_requires=['numpy', 'scipy', 'pandas'],
+    install_requires=['matplotlib', 'numpy', 'scipy', 'pandas'],
 )
