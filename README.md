@@ -163,3 +163,5 @@ We do the following:
     )
     
     print('res_a[0]', res_a[0])
+    
+    # res_a[0] [ 1.2789668   0.56955288 -2.57856013]
