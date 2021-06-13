@@ -114,3 +114,50 @@ We do the following:
 
 ### Advanced Usage
 
+#### Finding ZGE, with various initial sets of parameters
+
+    import kldmwr.univar
+    import numpy as np
+    import scipy.stats
+    
+    
+    def gev_cdf(y, p):
+    
+        if p[2] * p[2] < 1e-25:
+            return np.exp(- np.exp(- (y - p[0]) / p[1]))
+        else:
+            return np.exp(- (1. + p[2] * (y - p[0]) / p[1]) ** (- 1.0 / p[2]))
+    
+    
+    x = [-0.29505663, -0.10061241,  0.93107122,  1.25161993,  1.31516917,
+         1.39300232,  1.42739514,  1.49512478,  1.49936167, 1.49981574]
+    p_0 = np.array([1, 1, -2])
+    
+    ################################################################################
+    # initial values of parameters, p_is
+    
+    n_gen = 50
+    n_int = 20
+    mu_pls = np.random.uniform(0, .4, size=n_gen)
+    sg_pls = np.random.uniform(-0.5, 0.5, size=n_gen)
+    p_0t = p_0.reshape(3, 1)
+    p_0s = np.repeat(p_0t, n_gen, axis=1)
+    p_gs = p_0s + np.array([mu_pls, sg_pls, np.zeros(n_gen)]) 
+    p_gs = p_gs.transpose()
+    p_gsels = []
+    for p_g in p_gs:
+        if 1 + p_g[2] * (x[-1] - p_g[0]) / p_g[1] > 0 and\
+            1 + p_g[2] * (x[0] - p_g[0]) / p_g[1] > 0:
+            p_gsels.append(p_g)
+    
+    p_is = np.array(p_gsels)
+    p_is = p_is[:n_int]
+    
+    ################################################################################
+    
+    res_a = kldmwr.univar.find_min_viv_expl(
+        x, p_0, kldmwr.univar.find_zge, gev_cdf,
+        p_ints=p_is
+    )
+    
+    print('res_a[0]', res_a[0])
