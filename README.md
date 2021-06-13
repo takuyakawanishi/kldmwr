@@ -32,8 +32,6 @@ Kawanishi (2021).
 
 ## Installation
 
-
-Code:
      pip install -i https://test.pypi.org/simple/ kldmwr
 
 ## Basic Usage
