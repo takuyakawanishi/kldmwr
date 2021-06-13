@@ -76,7 +76,7 @@ We do the following:
     #              x: array([-0.11747087,  0.60645557]))
 
 
-#### ZGE (Zero-boundary Galerkin Estimator), or JMMPSE (Jiang's modified MPS Estimator)
+#### ZGE (or Jiang's modified MPS Estimator, JMMPSE)
 
     import kldmwr.univar
     import scipy.stats
@@ -88,13 +88,13 @@ We do the following:
     
     x = [0.12, -0.62, 1.16, -0.31, -0.02, -0.99, -0.45,  0.17]
     p_i = [0, 1]
-    res = kldmwr.univar.find_glz(x, p_i, norm_cdf)
+    res = kldmwr.univar.find_zge(x, p_i, norm_cdf)
     print(res[0])
 
     # [-0.13663485  0.62631407]
 
 
-#### MPSE or NGE (Nonzero-boundary Galerkin Estimator)
+#### NGE (or traditional MPS estimator)
 
     import kldmwr.univar
     import scipy.stats
@@ -106,7 +106,7 @@ We do the following:
     
     x = [0.12, -0.62, 1.16, -0.31, -0.02, -0.99, -0.45,  0.17]
     p_i = [0, 1]
-    res = kldmwr.univar.find_gln(x, p_i, norm_cdf)
+    res = kldmwr.univar.find_nge(x, p_i, norm_cdf)
     print(res[0])
 
     # [-0.11059383  0.80750186]
