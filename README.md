@@ -112,9 +112,11 @@ We do the following:
     # [-0.11059383  0.80750186]
 
 
-### Advanced Usage
+## Advanced Usage
 
-#### Finding ZGE, with various initial sets of parameters
+### Estimation with various initial sets of parameters
+
+#### GZE for the Generalized Extreme Value Distribution (GEVD)
 
     import kldmwr.univar
     import numpy as np
