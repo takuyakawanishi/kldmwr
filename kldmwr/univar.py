@@ -229,6 +229,7 @@ def find_glz(x, p, cdf, ipf=None):
             x, p, calc_gl_ipf, cdf, variant='zbc', ipf=ipf)
 
 
+
 def find_gln(x, p, cdf, ipf=None):
     """Returns the MPSE or NBGE.
 
@@ -261,8 +262,13 @@ def find_gln(x, p, cdf, ipf=None):
 
 def calc_mse(x, x_0):
     return ((x - x_0) ** 2).mean()
-
-
+#
+# Aliases
+#
+find_jmmpse = find_glz
+find_zge = find_glz
+find_mpse = find_gln
+find_nge = find_gln
 ########################################
 # Utilities
 ########################################
