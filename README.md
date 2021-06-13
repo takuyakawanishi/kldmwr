@@ -163,3 +163,7 @@ We do the following:
     print('res_a[0]', res_a[0])
     
     # res_a[0] [ 1.2789668   0.56955288 -2.57856013]
+
+## Reference
+Jiang, R. “A Modified MPS Method for Fitting the 3-Parameter Weibull Distribution,” 983–85, 2013. https://doi.org/10.1109/QR2MSE.2013.6625731.
+Kawanishi, Takuya. “Maximum Likelihood and the Maximum Product of Spacings from the Viewpoint of the Method of Weighted Residuals.” Computational and Applied Mathematics 39, no. 3 (May 29, 2020). https://doi.org/10.1007/s40314-020-01179-7.
