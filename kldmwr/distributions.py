@@ -294,8 +294,103 @@ def wbl_shp_pdf(x, p):
 def wbl_shp_sampling(n_rep, n_size, p):
     return scipy.stats.weibull_min.rvs(p[0], size=(n_rep, n_size))
 
+
+################################################################################
+# TPW
+################################################################################
+
+def calc_h_tpw(x, p):
+    return ((x - p[0]) / p[1])**p[2]
+
+
+def calc_h_tpw_mu(x, p):
+    return - p[2] / p[1] * ((x - p[0]) / p[1])**(p[2] - 1)
+
+
+def calc_h_tpw_sg(x, p):
+    return - p[2] / p[1] * ((x - p[0]) / p[1])**(p[2] - 1) * ((x - p[0]) / p[1])
+
+
+def calc_h_tpw_xi(x, p):
+    return np.log((x - p[0]) / p[1]) * ((x - p[0]) / p[1])**p[2]
+
+
+def calc_h_tpw_mumu(x, p):
+    return p[2] * (p[2] - 1) / p[1]**2 * ((x - p[0]) / p[1])**(p[2] - 2)
+
+
+def calc_h_tpw_musg(x, p):
+    return p[2] * (p[2] - 1) / p[1]**2 * ((x - p[0]) / p[1])**(p[2] - 2) * \
+        ((x - p[0]) / p[1]) + \
+        p[2] / p[1]**2 * ((x - p[0]) / p[1])**(p[2] - 1)
+
+def calc_h_tpw_muxi(x, p):
+    return - p[2] / p[1] * np.log((x - p[0]) / p[1]) * ((x - p[0]) / p[1])**(p[2] - 1) - \
+        1 / p[1] * ((x - p[0]) / p[1])**(p[2] - 1)
+
+
+
+def calc_h_tpw_sgsg(x, p):
+    return 2 * p[2] / p[1]**3 * (x - p[0]) * ((x - p[0]) / p[1])**(p[2] - 1) + \
+        p[2] * (p[2] - 1) / p[1]** 2 * ((x - p[0]) / p[1])**2 * \
+        ((x - p[0]) / p[1])**(p[2] - 2)
+
+
+def calc_h_tpw_sgxi(x, p):
+    return - (x - p[0]) / p[1]**2 * ((x - p[0]) / p[1])**(p[2] - 1) - \
+        p[2] * (x - p[0]) / p[1]**2 * np.log((x - p[0]) / p[1]) * \
+        ((x - p[0]) / p[1])**(p[2] - 1)
+
+
+def calc_h_tpw_xixi(x, p):
+    return (np.log((x - p[0]) / p[1]))**2 * ((x - p[0]) / p[1])**p[2]
+
+
+def tpw_cdf_mu(x, p):
+    return calc_h_tpw_mu(x, p) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_sg(x, p):
+    return calc_h_tpw_sg(x, p) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_xi(x, p):
+    return calc_h_tpw_xi(x, p) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_mumu(x, p):
+    return (calc_h_tpw_mumu(x, p) - calc_h_tpw_mu(x, p)**2) * \
+        np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_musg(x, p):
+    return (calc_h_tpw_musg(x, p) - calc_h_tpw_mu(x, p) *
+        calc_h_tpw_sg(x, p)) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_muxi(x, p):
+    return (calc_h_tpw_muxi(x, p) - calc_h_tpw_mu(x, p) *
+        calc_h_tpw_xi(x, p)) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_sgsg(x, p):
+    return (calc_h_tpw_sgsg(x, p) - calc_h_tpw_sg(x, p) *
+        calc_h_tpw_sg(x, p)) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_sgxi(x, p):
+    return (calc_h_tpw_sgxi(x, p) - calc_h_tpw_sg(x, p) *
+        calc_h_tpw_xi(x, p)) * np.exp(- calc_h_tpw(x, p))
+
+
+def tpw_cdf_xixi(x, p):
+    return (calc_h_tpw_xixi(x, p) - calc_h_tpw_xi(x, p) *
+        calc_h_tpw_xi(x, p)) * np.exp(- calc_h_tpw(x, p))
+
+
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()

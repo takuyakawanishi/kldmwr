@@ -12,7 +12,7 @@ class TestCalcDerivativesOfh(unittest.TestCase):
         self.p_0 = np.array([1, 1, xi])
         self.x = distributions.gev_sampling(1, 4, self.p_0)
         self.dlt = 1e-8
-        self.rtol_set = 1e-3
+        self.rtol_set = 1e-2
         self.ppdmu = self.p_0 + np.array([self.dlt, 0, 0])
         self.ppdsg = self.p_0 + np.array([0, self.dlt, 0])
         self.ppdxi = self.p_0 + np.array([0, 0, self.dlt])
