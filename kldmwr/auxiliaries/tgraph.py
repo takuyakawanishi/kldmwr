@@ -135,7 +135,7 @@ def calc_wt_ht(nhor, nver, syl, sxl, dimensions):
     return wt, ht
 
 
-def create_axes_in_points(nhor, nver, syl, sxl, dimensions):
+def create_axes_in_points(nhor, nver, syl, sxl, dimensions, pad):
     syl = np.array(syl)
     sxl = np.array(sxl)
     wfm = dimensions['wfm']
@@ -148,6 +148,9 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions):
     hxl = dimensions['hxl']
     htl = dimensions['htl']
     hsp = dimensions['hsp']
+    #
+    yapad = 4
+    xapad = 4
 
     axs = []
     wt, ht = calc_wt_ht(
@@ -157,11 +160,13 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions):
             ax = [
                 (wfm + ihor * (wfm + ws) + wsp +
                  wyl * np.sum(syl[:ihor + 1, 0]) +
-                 wtl * np.sum(syl[:ihor + 1, 1])),
+                wtl * np.sum(syl[:ihor + 1, 1])) + pad,
+                #
                 ht - ((iver + 1) * (hs + hfm) - hsp +
-                      hxl * np.sum(sxl[:iver, 0]) +
-                      htl * np.sum(sxl[:iver, 1])),
-                (ws - wsp), (hs - hsp)
+                hxl * np.sum(sxl[:iver, 0]) +
+                htl * np.sum(sxl[:iver, 1])) + pad,
+                (ws - wsp) - pad,
+                (hs - hsp) - pad
             ]
             axs.append(ax)
     return axs
@@ -195,15 +200,18 @@ def create_figure(fig_width_in_points, fig_height_in_points, enlargement):
 
 def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
                 show_xaxis_label_ticks_g, dimensions, fig_width, fig_height,
-                whfigs):
+                whfigs, pad):
     axs_in_points = []
     for i in range(n_figures):
         n_panel_horizontal = len(show_yaxis_label_ticks_g[i, :, 0])
         n_panel_vertical = len(show_xaxis_label_ticks_g[i, :, 0])
-        axs_in_points.append(create_axes_in_points(
-            n_panel_horizontal, n_panel_vertical,
-            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
-            dimensions))
+        axs_in_points.append(
+            create_axes_in_points(
+                n_panel_horizontal, n_panel_vertical,
+                show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
+                dimensions, pad
+            )
+        )
 
     fig_placements = np.zeros((n_figures, 2))
     for i_figure in range(n_figures):
@@ -232,30 +240,166 @@ def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
     return axss
 
 
-################################################################################
-#
-# Draw dimensions
-#
-################################################################################
+class TFigure(object):
+
+    def __init__(self, aspect_ratio=1, dimensions=None,
+                 syltf=None, sxltf=None, enlargement=1.0,
+                 spines_to_pad=None, pad=None,
+                 ):
+
+        if syltf is None:
+            syltf = [[[1, 1]]]
+        if sxltf is None:
+            sxltf = [[[1, 1]]]
+        if dimensions == None:
+            self.dimensions = set_figure_dimensions_in_points()
+            self.dimensions['hs'] = self.dimensions['ws'] / aspect_ratio
+        else:
+            self.dimensions = dimensions
 
 
-def draw_dimensions(show, axs, n_panel_horizontal, n_panel_vertical,
-                    show_yaxis_label_ticks_g, show_xaxis_label_ticks_g,
-                    dimensions, i):
-    if show:
-        axs = y_scales(
-            n_panel_horizontal, n_panel_vertical, axs,
-            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
-            dimensions
+        self.show_yaxis_label_ticks_figs = np.array(syltf)
+        self.show_xaxis_label_ticks_figs = np.array(sxltf)
+        self.enlargement = enlargement
+
+        self.pad = 0
+        if pad is not None:
+            self.pad = pad
+
+        self.n_figures = len(self.show_yaxis_label_ticks_figs)
+        self.n_panels = []
+        self.n_panels_horizontal = []
+        self.n_panels_vertical = []
+
+        for i in range(self.n_figures):
+            nhp = len(self.show_yaxis_label_ticks_figs[i, :, 0])
+            nvp = len(self.show_xaxis_label_ticks_figs[i, :, 0])
+            self.n_panels_horizontal.append(nhp)
+            self.n_panels_vertical.append(nvp)
+            self.n_panels.append(nhp * nvp)
+
+        self.fig_width_in_points, self.fig_height_in_points, self.whfigs = \
+            calc_figure_dimensions(
+                self.n_figures,
+                self.show_yaxis_label_ticks_figs,
+                self.show_xaxis_label_ticks_figs,
+                self.dimensions
+            )
+
+        self.fig_height_mm = self.fig_height_in_points * 25.4 / 72 * \
+                             self.enlargement
+        self.fig_width_mm = self.fig_width_in_points * 25.4 / 72 * \
+                            self.enlargement
+
+        self.fig = create_figure(
+            self.fig_width_in_points, self.fig_height_in_points,
+            self.enlargement
         )
-        axs = x_scales(
-            n_panel_horizontal, n_panel_vertical, axs,
-            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
-            dimensions
+
+        self.axs = create_axes(
+            self.fig, self.n_figures,
+            self.show_yaxis_label_ticks_figs, self.show_xaxis_label_ticks_figs,
+            self.dimensions, self.fig_width_in_points,
+            self.fig_height_in_points,
+            self.whfigs,
+            self.pad
         )
-    return axs
+
+        self.set_default_properties()
+
+        if spines_to_pad is not None:
+            self.select_and_pad_spines(spines_to_pad, self.pad)
+
+        self.show_tick_and_tick_labels_according_to_settings()
+
+    def set_default_properties(self):
+        for i in range(self.n_figures):
+            for ax in self.axs[i]:
+                for spine in ['top', 'right', 'bottom', 'left']:
+                    ax.spines[spine].set_linewidth(LWT)
+                ax.tick_params(
+                    axis='both', which='both', width=LWT,
+                    direction='in', labelsize=FSTL
+                )
+                for tick in ax.get_yticklabels():
+                    tick.set_fontname("Arial")
+                for tick in ax.get_xticklabels():
+                    tick.set_fontname("Arial")
+
+    def select_and_pad_spines(self, spines, pad):
+        for i in range(self.n_figures):
+            for i_ax, ax in enumerate(self.axs[i]):
+                adjust_spines(ax, spines, pad * self.enlargement)
+                ax.tick_params(
+                    axis='both', which='both', width=LWT,
+                    direction='out', labelsize=FSTL)
+
+                nvp_figi = self.n_panels_vertical[i]
+                ihor = np.int(i_ax / nvp_figi)
+                ivar = np.mod(i_ax, nvp_figi)
+                vis_x = self.show_xaxis_label_ticks_figs[i, ivar, 1]
+                vis_y = self.show_yaxis_label_ticks_figs[i, ihor, 1]
+                if vis_x == 0:
+                    ax.spines['bottom'].set_visible(False)
+                    ax.spines['top'].set_visible(False)
+                if vis_y == 0:
+                    ax.spines['left'].set_visible(False)
+                    ax.spines['right'].set_visible(False)
+
+    def show_tick_and_tick_labels_according_to_settings(self):
+        for i in range(self.n_figures):
+            for i_ax, ax in enumerate(self.axs[i]):
+                nvp_figi = self.n_panels_vertical[i]
+                nhp_figi = self.n_panels_horizontal[i]
+                ihor = np.int(i_ax / nvp_figi)
+                ivar = np.mod(i_ax, nvp_figi)
+                ax.xaxis.set_visible(
+                    self.show_xaxis_label_ticks_figs[i, ivar, 1]
+                )
+                ax.yaxis.set_visible(
+                    self.show_yaxis_label_ticks_figs[i, ihor, 1]
+                )
 
 
+def main():
+    fig = TFigure(
+        enlargement=1.5,
+        sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
+        syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
+        spines_to_pad=['bottom', 'left'], pad=8
+    )
+
+    print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
+    print('119 mm wide and not higher than 195 mm.')
+    print('figure width: {:.1f}, height: {:1f}'.
+          format(fig.fig_width_mm, fig.fig_height_mm))
+    # fig.select_and_pad_spines(['bottom', 'left'], 5)
+
+    print('Number of figures = ', fig.n_figures)
+    print('Number of panels  = ', fig.n_panels)
+    print('Number of horizontal panels = ', fig.n_panels_horizontal)
+    print('Number of vertical panels', fig.n_panels_vertical)
+    print(len(fig.axs[0]))
+    for axfig in fig.axs:
+        for ax in axfig:
+            print(ax)
+            ax.xaxis.set_minor_locator(AutoMinorLocator())
+    plt.show()
+
+
+"""
+To Do
+
+* Switch off tick labels according to the indicators.
+
+
+"""
+
+if __name__ == '__main__':
+    main()
+
+
+"""
 def y_scales(nhp, nvp, axs, syl, sxl, dimensions):
     hxl = dimensions['hxl']
     htl = dimensions['htl']
@@ -404,7 +548,6 @@ def x_scales(nhp, nvp, axs, syl, sxl, dimensions):
     )
     for ihp in range(nhp):
         ihp_bottom = (ihp + 1) * nvp - 1
-        """
         axs[ihp_bottom].annotate(
             '',
             xy=(0 / wt, y),
@@ -413,7 +556,6 @@ def x_scales(nhp, nvp, axs, syl, sxl, dimensions):
             arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
                         'linewidth': LWT, 'color': 'b', 'alpha': .5},
         )
-        """
         axs[ihp_bottom].annotate(
             '',
             xy=(
@@ -481,146 +623,21 @@ def x_scales(nhp, nvp, axs, syl, sxl, dimensions):
         )
     return axs
 
-
-class TFigure(object):
-
-    def __init__(self, aspect_ratio=1, dimensions=None,
-                 syltf=None, sxltf=None, enlargement=1.0,
-                 spines_to_pad=None, pad=None,
-                 ):
-
-        if syltf is None:
-            syltf = [[[1, 1]]]
-        if sxltf is None:
-            sxltf = [[[1, 1]]]
-        if dimensions == None:
-            self.dimensions = set_figure_dimensions_in_points()
-            self.dimensions['hs'] = self.dimensions['ws'] / aspect_ratio
-        else:
-            self.dimensions = dimensions
-        self.show_yaxis_label_ticks_figs = np.array(syltf)
-        self.show_xaxis_label_ticks_figs = np.array(sxltf)
-        self.enlargement = enlargement
-        self.n_figures = len(self.show_yaxis_label_ticks_figs)
-
-        self.n_panels = []
-        self.n_panels_horizontal = []
-        self.n_panels_vertical = []
-
-        for i in range(self.n_figures):
-            nhp = len(self.show_yaxis_label_ticks_figs[i, :, 0])
-            nvp = len(self.show_xaxis_label_ticks_figs[i, :, 0])
-            self.n_panels_horizontal.append(nhp)
-            self.n_panels_vertical.append(nvp)
-            self.n_panels.append(nhp * nvp)
-
-        self.fig_width_in_points, self.fig_height_in_points, self.whfigs = \
-            calc_figure_dimensions(
-                self.n_figures,
-                self.show_yaxis_label_ticks_figs,
-                self.show_xaxis_label_ticks_figs,
-                self.dimensions
-            )
-
-        self.fig_height_mm = self.fig_height_in_points * 25.4 / 72 * \
-                             self.enlargement
-        self.fig_width_mm = self.fig_width_in_points * 25.4 / 72 * \
-                            self.enlargement
-
-        self.fig = create_figure(
-            self.fig_width_in_points, self.fig_height_in_points,
-            self.enlargement
+def draw_dimensions(show, axs, n_panel_horizontal, n_panel_vertical,
+                    show_yaxis_label_ticks_g, show_xaxis_label_ticks_g,
+                    dimensions, i):
+    if show:
+        axs = y_scales(
+            n_panel_horizontal, n_panel_vertical, axs,
+            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
+            dimensions
         )
-
-        self.axs = create_axes(
-            self.fig, self.n_figures,
-            self.show_yaxis_label_ticks_figs, self.show_xaxis_label_ticks_figs,
-            self.dimensions, self.fig_width_in_points,
-            self.fig_height_in_points, self.whfigs
+        axs = x_scales(
+            n_panel_horizontal, n_panel_vertical, axs,
+            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
+            dimensions
         )
-        self.set_default_properties()
-
-        if spines_to_pad is not None:
-            self.select_and_pad_spines(spines_to_pad, pad)
-
-        self.show_tick_and_tick_labels_according_to_settings()
-
-    def set_default_properties(self):
-        for i in range(self.n_figures):
-            for ax in self.axs[i]:
-                for spine in ['top', 'right', 'bottom', 'left']:
-                    ax.spines[spine].set_linewidth(LWT)
-                ax.tick_params(
-                    axis='both', which='both', width=LWT,
-                    direction='in', labelsize=FSTL
-                )
-                for tick in ax.get_yticklabels():
-                    tick.set_fontname("Arial")
-                for tick in ax.get_xticklabels():
-                    tick.set_fontname("Arial")
-
-    def select_and_pad_spines(self, spines, pad):
-        for i in range(self.n_figures):
-            for i_ax, ax in enumerate(self.axs[i]):
-                adjust_spines(ax, spines, pad * self.enlargement)
-                ax.tick_params(
-                    axis='both', which='both', width=LWT,
-                    direction='out', labelsize=FSTL)
-
-                nvp_figi = self.n_panels_vertical[i]
-                ihor = np.int(i_ax / nvp_figi)
-                ivar = np.mod(i_ax, nvp_figi)
-                vis_x = self.show_xaxis_label_ticks_figs[i, ivar, 1]
-                vis_y = self.show_yaxis_label_ticks_figs[i, ihor, 1]
-                if vis_x == 0:
-                    ax.spines['bottom'].set_visible(False)
-                    ax.spines['top'].set_visible(False)
-                if vis_y == 0:
-                    ax.spines['left'].set_visible(False)
-                    ax.spines['right'].set_visible(False)
-
-    def show_tick_and_tick_labels_according_to_settings(self):
-        for i in range(self.n_figures):
-            for i_ax, ax in enumerate(self.axs[i]):
-                nvp_figi = self.n_panels_vertical[i]
-                nhp_figi = self.n_panels_horizontal[i]
-                ihor = np.int(i_ax / nvp_figi)
-                ivar = np.mod(i_ax, nvp_figi)
-                ax.xaxis.set_visible(self.show_xaxis_label_ticks_figs[i, ivar, 1])
-                ax.yaxis.set_visible(self.show_yaxis_label_ticks_figs[i, ihor, 1])
-
-
-def main():
-    fig = TFigure(enlargement=1.5,
-                  sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
-                  syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
-                  spines_to_pad=['bottom', 'left'], pad=5
-                  )
-    print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
-    print('119 mm wide and not higher than 195 mm.')
-    print('figure width: {:.1f}, height: {:1f}'.
-          format(fig.fig_width_mm, fig.fig_height_mm))
-    # fig.select_and_pad_spines(['bottom', 'left'], 5)
-
-    print('Number of figures = ', fig.n_figures)
-    print('Number of panels  = ', fig.n_panels)
-    print('Number of horizontal panels = ', fig.n_panels_horizontal)
-    print('Number of vertical panels', fig.n_panels_vertical)
-    print(len(fig.axs[0]))
-    for axfig in fig.axs:
-        for ax in axfig:
-            print(ax)
-            ax.xaxis.set_minor_locator(AutoMinorLocator())
-    plt.show()
+    return axs
 
 
 """
-To Do
-
-* Switch off tick labels according to the indicators.
-
-
-"""
-
-if __name__ == '__main__':
-    main()
