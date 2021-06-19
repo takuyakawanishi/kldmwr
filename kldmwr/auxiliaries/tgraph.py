@@ -97,25 +97,25 @@ def set_figure_dimensions_in_points():
     htl = hl / 2  # height of xaxis tick label
     hsp = wsp     # spine pad height, subtract
     """
-    fgpts = {
-        'wfm': 4,
-        'hfm': 4,
-        'wpg': 4,
+    dimensions = {
+        'wfm': 1,  # Width of figure margin
+        'hfm': 2,
+        'wpg': 4,  # Width of panel gap
         'hpg': 4,
         'ws': 72,
-        'wl': 24,
-        'wyl': 24 / 4,
-        'wtl': 24 * 3 / 4,
+        'wl': 26,
+        'wyl': 12,
+        'wtl': 14,  # 18 - wpg
         'hs': 72,
-        'hl': 24 * 3 / 4,
-        'hxl': 24 / 4 * 3 / 4,
-        'htl': 24 * 3 / 4 * 3 / 4,
+        'hl': 24,  # 24 * 3 / 4,
+        'hxl': 12.0,
+        'htl': 12.0,
         'wsp': 4,
         'hsp': 4,
         'wfg': 4,
         'hfg': 4,
     }
-    return fgpts
+    return dimensions
 
 
 def calc_wt_ht(nhor, nver, syl, sxl, dimensions):
@@ -368,10 +368,10 @@ class TFigure(object):
 def main():
 
     fig = TFigure(
-        enlargement=1.5,
+        enlargement=1.2,
         sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
         syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
-        spines_to_pad=['bottom', 'left'], pad=5
+        spines_to_pad=['bottom', 'left'], pad=4
     )
     print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
     print('119 mm wide and not higher than 195 mm.')
@@ -398,7 +398,7 @@ def main():
     ax.annotate('$a$', xy=(0, 0), xytext=(-el, 0.5),
                 textcoords='axes fraction',
                 ha='left', va='center')
-    ax.plot([-el, el], [0.5, 0.5], clip_on=False)
+    # ax.plot([-el, el], [0.5, 0.5], clip_on=False)
     ax.set_xlim(0, 1)
     plt.show()
 
