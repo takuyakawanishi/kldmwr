@@ -2,8 +2,9 @@ from ad import gh
 from ad.admath import *
 import numpy as np
 import sys
-sys.path.append('../../../../../packages/kldmwr/kldmwr')
-import kldmwr
+# sys.path.append('../../../../../packages/kldmwr/kldmwr')
+from kldmwr import univar
+from kldmwr import utilities
 from distributions import *
 
 
@@ -87,8 +88,8 @@ def main():
     cdf = gev_cdf  # from kldmwr/distributions
     pdf = gev_pdf  # from kldmwr/distributions
     p_i = [1, 1, 1]
-    res = kldmwr.find_min_viv(
-            x, p_i, kldmwr.find_glz, cdf, ipf=gev_ipf
+    res = univar.find_min_viv(
+            x, p_i, univar.find_glz, cdf, ipf=gev_ipf
         )
     success = res[2]
     print('ZMPSE succeeded? ',  success)
@@ -96,14 +97,14 @@ def main():
     # sys.exit()
     p_hat_z = list(res[0])
     x_unq, cnt = np.unique(x, return_counts=True)
-    wgt = kldmwr.weights_zbc(cnt)
+    wgt = univar.weights_zbc(cnt)
 
     print('x_unq, wgt, pdf, cdf = ',   x_unq, wgt, pdf, cdf)
     print('========== Results for ZMPS')
     print('zmpse = ',  p_hat_z)
     lps_nnp = gev_log_product_of_spacings_nnp(x_unq, wgt, p_hat_z)
     print('lps by gev_log_product_of_spacings_nnp        = ', lps_nnp)
-    lps_univar = kldmwr.log_product_of_spacings_wgt_zbc(x, p_hat_z, cdf)
+    lps_univar = univar.log_product_of_spacings_wgt_zbc(x, p_hat_z, cdf)
     print('lps by kldmwr.log_product_of_spacings_wgt_zbc = ', lps_univar)
 
     dat = GradHessAd(x_unq, wgt, func=gev_log_product_of_spacings_nnp)
@@ -116,8 +117,8 @@ def main():
 
     print('========== Results for MLE')
     wgt = np.copy(cnt)
-    res = kldmwr.find_min_viv(
-            x, p_i, kldmwr.find_mle, pdf, ipf=gev_ipf
+    res = univar.find_min_viv(
+            x, p_i, univar.find_mle, pdf, ipf=gev_ipf
         )
     success = res[2]
     print('MLE succeeded? ',  success)
@@ -125,7 +126,7 @@ def main():
 
     ll_nnp = gev_log_likelihood_nnp(x_unq, wgt, p_hat_l)
     print('ll by gev_log_likelihood_nnp =', ll_nnp)
-    ll_univar = kldmwr.log_likelihood(x, p_hat_l, pdf)
+    ll_univar = univar.log_likelihood(x, p_hat_l, pdf)
     print('ll by kldmwr.log_likelihood  =', ll_univar)
     dat = GradHessAd(x, wgt, func=gev_log_likelihood_nnp)
     h_l = dat.ghs(p_hat_l)

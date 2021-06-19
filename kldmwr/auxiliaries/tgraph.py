@@ -257,7 +257,6 @@ class TFigure(object):
         else:
             self.dimensions = dimensions
 
-
         self.show_yaxis_label_ticks_figs = np.array(syltf)
         self.show_xaxis_label_ticks_figs = np.array(sxltf)
         self.enlargement = enlargement
@@ -362,11 +361,12 @@ class TFigure(object):
 
 
 def main():
+
     fig = TFigure(
         enlargement=1.5,
         sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
         syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
-        spines_to_pad=['bottom', 'left'], pad=8
+        spines_to_pad=['bottom', 'left'], pad=0
     )
 
     print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
@@ -380,10 +380,15 @@ def main():
     print('Number of horizontal panels = ', fig.n_panels_horizontal)
     print('Number of vertical panels', fig.n_panels_vertical)
     print(len(fig.axs[0]))
+
     for axfig in fig.axs:
         for ax in axfig:
-            print(ax)
             ax.xaxis.set_minor_locator(AutoMinorLocator())
+            print(ax)
+            # print(ax.get_lines())
+            # aaa = ax.get_children()
+            # for aa in aaa:
+            #     print(aa)
     plt.show()
 
 
