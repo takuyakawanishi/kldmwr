@@ -4,7 +4,6 @@
     <list default="true" id="c39299b7-5ce7-4e6b-a47f-c6e01f8f047a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kldmwr/auxiliaries/tgraph.py" beforeDir="false" afterPath="$PROJECT_DIR$/kldmwr/auxiliaries/tgraph.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kldmwr/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/kldmwr/utilities.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +40,7 @@
       <recent name="$PROJECT_DIR$/kldmwr" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.utilities">
+  <component name="RunManager" selected="Python.tgraph">
     <configuration name="test_gev" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="kldmwr" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -128,8 +127,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.utilities" />
         <item itemvalue="Python.tgraph" />
+        <item itemvalue="Python.utilities" />
         <item itemvalue="Python.test_univar" />
         <item itemvalue="Python.test_gev" />
       </list>

@@ -104,12 +104,12 @@ def set_figure_dimensions_in_points():
         'hpg': 4,
         'ws': 72,
         'wl': 24,
-        'wyl': 24 / 2,
-        'wtl': 24 / 2,
+        'wyl': 24 / 4,
+        'wtl': 24 * 3 / 4,
         'hs': 72,
         'hl': 24 * 3 / 4,
-        'hxl': 24 / 2 * 3 / 4,
-        'htl': 24 / 2 * 3 / 4,
+        'hxl': 24 / 4 * 3 / 4,
+        'htl': 24 * 3 / 4 * 3 / 4,
         'wsp': 4,
         'hsp': 4,
         'wfg': 4,
@@ -124,13 +124,16 @@ def calc_wt_ht(nhor, nver, syl, sxl, dimensions):
     ws = dimensions['ws']
     wyl = dimensions['wyl']
     wtl = dimensions['wtl']
+    wpg = dimensions['wpg']
+
     hs = dimensions['hs']
     hxl = dimensions['hxl']
     htl = dimensions['htl']
+    hpg = dimensions['hpg']
 
-    wt = nhor * ws + (nhor + 1) * wfm + wyl * np.sum(syl[:, 0]) + \
+    wt = nhor * ws + 2 * wfm + (nhor - 1) * wpg + wyl * np.sum(syl[:, 0]) + \
          wtl * np.sum(syl[:, 1])
-    ht = nver * hs + (nver + 1) * hfm + hxl * np.sum(sxl[:, 0]) + \
+    ht = nver * hs + 2 * hfm + (nver - 1) * hpg + hxl * np.sum(sxl[:, 0]) + \
          htl * np.sum(sxl[:, 1])
     return wt, ht
 
@@ -140,6 +143,9 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions, pad):
     sxl = np.array(sxl)
     wfm = dimensions['wfm']
     hfm = dimensions['hfm']
+    wpg = dimensions['wpg']
+    hpg = dimensions['hpg']
+
     ws = dimensions['ws']
     wyl = dimensions['wyl']
     wtl = dimensions['wtl']
@@ -153,18 +159,17 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions, pad):
     xapad = 4
 
     axs = []
-    wt, ht = calc_wt_ht(
-        nhor, nver, syl, sxl, dimensions)
+    wt, ht = calc_wt_ht(nhor, nver, syl, sxl, dimensions)
     for ihor in range(nhor):
         for iver in range(nver):
             ax = [
-                (wfm + ihor * (wfm + ws) + wsp +
+                (wfm + ihor * (wpg + ws) + wsp +
                  wyl * np.sum(syl[:ihor + 1, 0]) +
-                wtl * np.sum(syl[:ihor + 1, 1])) + pad,
+                 wtl * np.sum(syl[:ihor + 1, 1])),
                 #
-                ht - ((iver + 1) * (hs + hfm) - hsp +
+                ht - ((iver + 1) * (hs + hpg) - hsp +
                 hxl * np.sum(sxl[:iver, 0]) +
-                htl * np.sum(sxl[:iver, 1])) + pad,
+                htl * np.sum(sxl[:iver, 1])),
                 (ws - wsp) - pad,
                 (hs - hsp) - pad
             ]
@@ -366,15 +371,12 @@ def main():
         enlargement=1.5,
         sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
         syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
-        spines_to_pad=['bottom', 'left'], pad=0
+        spines_to_pad=['bottom', 'left'], pad=5
     )
-
     print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
     print('119 mm wide and not higher than 195 mm.')
     print('figure width: {:.1f}, height: {:1f}'.
           format(fig.fig_width_mm, fig.fig_height_mm))
-    # fig.select_and_pad_spines(['bottom', 'left'], 5)
-
     print('Number of figures = ', fig.n_figures)
     print('Number of panels  = ', fig.n_panels)
     print('Number of horizontal panels = ', fig.n_panels_horizontal)
@@ -385,10 +387,19 @@ def main():
         for ax in axfig:
             ax.xaxis.set_minor_locator(AutoMinorLocator())
             print(ax)
-            # print(ax.get_lines())
-            # aaa = ax.get_children()
-            # for aa in aaa:
-            #     print(aa)
+    ws = fig.dimensions['ws']
+    wl = fig.dimensions['wl']
+    wax = ws - fig.pad
+    wltp = wl + fig.pad
+    el = wltp / wax
+    print(ws, wl, wltp, fig.pad)
+    print(el)
+    ax = fig.axs[0][0]
+    ax.annotate('$a$', xy=(0, 0), xytext=(-el, 0.5),
+                textcoords='axes fraction',
+                ha='left', va='center')
+    ax.plot([-el, el], [0.5, 0.5], clip_on=False)
+    ax.set_xlim(0, 1)
     plt.show()
 
 
