@@ -155,7 +155,7 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions):
                  wyl * np.sum(syl[:ihor + 1, 0]) +
                  wtl * np.sum(syl[:ihor + 1, 1])),
                 #
-                ht - ((iver + 1) * (hs + hpg) - hsp +
+                ht - hfm - ((iver + 1) * (hs + hpg) - hsp +
                 hxl * np.sum(sxl[:iver, 0]) +
                 htl * np.sum(sxl[:iver, 1])),
                 (ws - wsp),
