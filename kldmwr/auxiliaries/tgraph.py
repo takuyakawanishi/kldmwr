@@ -211,8 +211,8 @@ def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
     fig_placements = np.zeros((n_figures, 2))
     for i_figure in range(n_figures):
         fig_placements[i_figure, 1] = fig_height - dimensions['hom'] - \
-                                      np.sum(whfigs[:i_figure, 1]) - dimensions[
-                                          'hfg'] * i_figure
+                                      np.sum(whfigs[:i_figure, 1]) - \
+                                      dimensions['hfg'] * i_figure
         fig_placements[i_figure, 0] = fig_height - dimensions['hom'] - \
                                       np.sum(whfigs[:i_figure + 1, 1]) - \
                                       dimensions['hfg'] * i_figure
@@ -221,7 +221,7 @@ def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
         global_axs_in_points[i_figure, :, 1] = \
             global_axs_in_points[i_figure, :, 1] + fig_placements[i_figure, 0]
     gaxs = np.copy(global_axs_in_points)
-    gaxs[:, :, 0] = gaxs[:, :, 0] / fig_width
+    gaxs[:, :, 0] = (gaxs[:, :, 0] + dimensions['wom']) / fig_width
     gaxs[:, :, 1] = gaxs[:, :, 1] / fig_height
     gaxs[:, :, 2] = gaxs[:, :, 2] / fig_width
     gaxs[:, :, 3] = gaxs[:, :, 3] / fig_height
