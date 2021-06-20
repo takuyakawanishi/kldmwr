@@ -88,23 +88,25 @@ def set_figure_dimensions_in_points():
     hsp = wsp     # spine pad height, subtract
     """
     dimensions = {
-        'wfm': 4,  # Width of figure margin
-        'hfm': 4,
+        'wom': 4,  # Width of outer margin
+        'hom': 4,  # Width of outer margin
+        'wfm': 0,  # Width of figure margin
+        'hfm': 0,
         'wpg': 4,  # Width of panel gap
         'hpg': 4,
         'ws': 72,
-        'wl': 26,
         'wyl': 12,
         'wtl': 14,  # 18 - wpg, 18 makes panel size * 0.25
         'hs': 72,
-        'hl': 24,  # 24 * 3 / 4,
-        'hxl': 12.0,
-        'htl': 12.0,
+        'hxl': 12,
+        'htl': 12,
         'wsp': 0,
         'hsp': 0,
-        'wfg': 4,
-        'hfg': 4,
+        'wfg': 4,  # Width of figure gap
+        'hfg': 4,  # Height of panel gap
     }
+    dimensions['wl'] = dimensions['wyl'] + dimensions['wtl']
+    dimensions['hl'] = dimensions['hxl'] + dimensions['htl']
     return dimensions
 
 
@@ -155,9 +157,8 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions):
                  wyl * np.sum(syl[:ihor + 1, 0]) +
                  wtl * np.sum(syl[:ihor + 1, 1])),
                 #
-                ht - hfm - ((iver + 1) * hs + hsp - iver * hpg -
-                hxl * np.sum(sxl[:iver, 0]) +
-                htl * np.sum(sxl[:iver, 1])),
+                ht - hfm - (iver + 1) * hs + hsp - iver * hpg -
+                hxl * np.sum(sxl[:iver, 0]) - htl * np.sum(sxl[:iver, 1]),
                 (ws - wsp),
                 (hs - hsp)
             ]
@@ -180,8 +181,9 @@ def calc_figure_dimensions(
             dimensions)
         whfigs.append([wt, ht])
     whfigs = np.array(whfigs)
-    fig_height = np.sum(whfigs[:, 1]) + (n_figures - 1) * dimensions['hfg']
-    fig_width = whfigs[0, 0]
+    fig_height = 2 * dimensions['hom'] + np.sum(whfigs[:, 1]) + \
+        (n_figures - 1) * dimensions['hfg']
+    fig_width = 2 * dimensions['wom'] + whfigs[0, 0]
     return fig_width, fig_height, whfigs
 
 
@@ -208,10 +210,10 @@ def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
 
     fig_placements = np.zeros((n_figures, 2))
     for i_figure in range(n_figures):
-        fig_placements[i_figure, 1] = fig_height - \
+        fig_placements[i_figure, 1] = fig_height - dimensions['hom'] - \
                                       np.sum(whfigs[:i_figure, 1]) - dimensions[
                                           'hfg'] * i_figure
-        fig_placements[i_figure, 0] = fig_height - \
+        fig_placements[i_figure, 0] = fig_height - dimensions['hom'] - \
                                       np.sum(whfigs[:i_figure + 1, 1]) - \
                                       dimensions['hfg'] * i_figure
     global_axs_in_points = np.array(axs_in_points)
@@ -283,8 +285,11 @@ class TFigure(object):
                 self.dimensions
             )
 
+        self.wfp = self.fig_width_in_points
+        self.hfp = self.fig_height_in_points
         self.fig_height_mm = self.fig_height_in_points * 25.4 / 72 * \
                              self.enlargement
+
         self.fig_width_mm = self.fig_width_in_points * 25.4 / 72 * \
                             self.enlargement
 
@@ -377,7 +382,7 @@ def main():
         enlargement=1.2,
         sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
         syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
-        spines_to_pad=['bottom', 'left'], wpad=6, hpad=6
+        spines_to_pad=['bottom', 'left'], wpad=2, hpad=2
     )
     print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
     print('119 mm wide and not higher than 195 mm.')
@@ -392,7 +397,7 @@ def main():
     for axfig in fig.axs:
         for ax in axfig:
             ax.xaxis.set_minor_locator(AutoMinorLocator())
-            print(ax)
+            # print(ax)
     ws = fig.dimensions['ws']
     wl = fig.dimensions['wl']
     wax = ws - fig.dimensions['wsp']
@@ -406,260 +411,36 @@ def main():
                 ha='left', va='center')
     # ax.plot([-el, el], [0.5, 0.5], clip_on=False)
     ax.set_xlim(0, 1)
+
+    print(fig.wfp, fig.hfp)
+    wfm = fig.dimensions['wfm']
+    hfm = fig.dimensions['hfm']
+    ws = fig.dimensions['ws']
+    hom = fig.dimensions['hom']
+    hs = fig.dimensions['hs']
+    htl = fig.dimensions['htl']
+    hxl = fig.dimensions['hxl']
+    hpg = fig.dimensions['hpg']
+    hfg = fig.dimensions['hfg']
+    s = wfm * 2 + ws * 2
+    print('hfp = ', fig.hfp)
+    print('hfm = ', hfm)
+    print('hs  = ', hs)
+    print('hpg = ', hpg)
+    print('hom = ', hom)
+    s_h_p = hfm * 2 + hs * 2 + hxl + htl + hpg
+    s_h = 2 * hom + 4 * hfm + 4 * hs + 2 * htl + 2 * hxl + 2 * hpg + hfg
+    print(s_h_p)
+    print(s_h)
+
+    print(fig.whfigs)
     plt.show()
 
 
-"""
-To Do
-
-* Switch off tick labels according to the indicators.
-
-
-"""
+    # sxltf = [[[0, 0], [1, 1]],
+    #          [[0, 0], [1, 1]]],
 
 if __name__ == '__main__':
     main()
 
 
-"""
-def y_scales(nhp, nvp, axs, syl, sxl, dimensions):
-    hxl = dimensions['hxl']
-    htl = dimensions['htl']
-    hfm = dimensions['hfm']
-    hs = dimensions['hs']
-    hsp = dimensions['hsp']
-    wt, ht = calc_wt_ht(nhp, nvp, syl, sxl, dimensions)
-    sxl = np.array(sxl)
-    x = .5 / nhp
-    x2 = x * 0.9
-    xsps = x * 0.05
-    #
-    # Top margin
-    #
-    axs[0].annotate(
-        '', xy=(x, 1), xytext=(x, (ht - hfm) / ht),
-        xycoords='figure fraction', textcoords='figure fraction',
-        arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                    'linewidth': .5, 'color': 'b', 'alpha': .5},
-    )
-    axs[0].annotate(
-        'hfm:' + str(hfm), xy=(0, 0),
-        xytext=(x + xsps, (ht - hfm - 0.1 * (hs - hsp)) / ht),
-        textcoords='figure fraction',
-        fontsize=6, va='center', c='b', alpha=.5
-    )
-    for ivp in range(nvp):
-        axs[ivp].annotate(
-            '', xy=(
-                x2, (ht - hfm - ivp * hs - hxl * np.sum(sxl[:ivp, 0]) -
-                     htl * np.sum(sxl[:ivp, 1])) / ht),
-            xytext=(
-                x2, (ht - hfm - (ivp + 1) * hs - hxl * np.sum(sxl[:ivp, 0]) -
-                     htl * np.sum(sxl[:ivp, 1])) / ht
-            ),
-            xycoords='figure fraction', textcoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': .5, 'color': 'b', 'alpha': .5},
-        )
-        axs[ivp].annotate(
-            'hs:' + str(hs), xy=(x2 - xsps, (ht - hfm) / ht),
-            xytext=(
-                x2 - xsps,
-                (ht - hfm - (ivp + .5) * hs - hxl * np.sum(sxl[:ivp, 0]) -
-                 htl * np.sum(sxl[:ivp, 1])) / ht),
-            xycoords='figure fraction', textcoords='figure fraction',
-            fontsize=6, va='center', ha='right', c='b', alpha=.5
-        )
-        if sxl[ivp, 1]:
-            axs[ivp].annotate(
-                '', xy=(x2, (ht - hfm - (ivp + 1) * hs -
-                             hxl * np.sum(sxl[:ivp, 0]) -
-                             htl * np.sum(sxl[:ivp, 1])) / ht),
-                xytext=(
-                    x2, (ht - hfm - (ivp + 1) * hs -
-                         hxl * np.sum(sxl[:ivp, 0]) -
-                         htl * np.sum(sxl[:ivp + 1, 1])) / ht),
-                xycoords='figure fraction', textcoords='figure fraction',
-                arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                            'linewidth': .5, 'color': 'b', 'alpha': .5},
-            )
-            axs[ivp].annotate(
-                'htl:' + str(hsp), xy=(0, 0),
-                xytext=(
-                    x2 - xsps, (ht - hfm - (ivp + 1) * hs -
-                                hxl * np.sum(sxl[:ivp, 0]) -
-                                htl * (np.sum(sxl[:ivp + 1, 1]) - 0.5)) / ht),
-                textcoords='figure fraction',
-                fontsize=6, ha='right', va='center', c='b', alpha=.5
-            )
-        if sxl[ivp, 0]:
-            axs[ivp].annotate(
-                '', xy=(x2, (ht - hfm - (ivp + 1) * hs -
-                             hxl * np.sum(sxl[:ivp + 1, 0]) -
-                             htl * np.sum(sxl[:ivp, 1])) / ht),
-                xytext=(
-                    x2, (ht - hfm - (ivp + 1) * hs -
-                         hxl * np.sum(sxl[:ivp + 1, 0]) -
-                         htl * np.sum(sxl[:ivp + 1, 1])) / ht),
-                xycoords='figure fraction', textcoords='figure fraction',
-                arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                            'linewidth': .5, 'color': 'b', 'alpha': .5},
-            )
-            axs[ivp].annotate(
-                'hxl:' + str(hsp), xy=(0, 0),
-                xytext=(
-                    x2 - xsps, (ht - hfm - (ivp + 1) * hs -
-                                hxl * np.sum(sxl[:ivp + 1, 0]) -
-                                htl * (np.sum(sxl[:ivp + 1, 1]) - 0.5)) / ht),
-                textcoords='figure fraction',
-                fontsize=6, ha='right', va='center', c='b', alpha=.5
-            )
-        plt.figtext(x + xsps,
-                    (ht - hfm - (ivp + 1) * hs -
-                     hxl * np.sum(sxl[:ivp, 0]) -
-                     htl * np.sum(sxl[:ivp, 1]) + 0.5 * hsp
-                     ) / ht,
-                    "hsp", fontsize=6, va='center',
-                    )
-        axs[ivp].annotate(
-            '', xy=(x, (ht - hfm - (ivp + 1) * hs -
-                        hxl * np.sum(sxl[:ivp, 0]) -
-                        htl * np.sum(sxl[:ivp, 1])) / ht),
-            xytext=(
-                x, (ht - hfm - (ivp + 1) * hs -
-                    hxl * np.sum(sxl[:ivp, 0]) -
-                    htl * np.sum(sxl[:ivp, 1]) + hsp) / ht),
-            xycoords='figure fraction', textcoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': .5, 'color': 'b', 'alpha': .5},
-        )
-        axs[ivp].annotate(
-            'hsp:' + str(hsp), xy=(0, 0),
-            xytext=(
-                x + xsps, (ht - hfm - (ivp + 1) * hs -
-                           hxl * np.sum(sxl[:ivp, 0]) -
-                           htl * np.sum(sxl[:ivp, 1]) + 0.5 * hsp) / ht),
-            textcoords='figure fraction',
-            fontsize=6, va='center', c='b', alpha=.5,
-            zorder=1000, clip_on=False,
-        )
-    return axs
-
-
-def x_scales(nhp, nvp, axs, syl, sxl, dimensions):
-    wyl = dimensions['wyl']
-    wtl = dimensions['wtl']
-    wfm = dimensions['wfm']
-    ws = dimensions['ws']
-    wl = dimensions['wl']
-    wt, ht = calc_wt_ht(nhp, nvp, syl, sxl, dimensions)
-    y = .48
-    # y2 = .42
-    ysps = .02
-    axs[0].annotate(
-        '', xy=(0, y), xytext=(wfm / wt, y),
-        xycoords='figure fraction', textcoords='figure fraction',
-        arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                    'linewidth': .5, 'color': 'b', 'alpha': .5},
-    )
-    axs[0].annotate(
-        'wl:' + str(wl), xy=(0, 0),
-        xytext=((wfm + 0.5 * wl) / wt, y - ysps),
-        xycoords='figure fraction', textcoords='figure fraction',
-        fontsize=6, va='top', ha='center', c='b', alpha=.5
-    )
-    for ihp in range(nhp):
-        ihp_bottom = (ihp + 1) * nvp - 1
-        axs[ihp_bottom].annotate(
-            '',
-            xy=(0 / wt, y),
-            xytext=(wfm / wt, y),
-            xycoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': LWT, 'color': 'b', 'alpha': .5},
-        )
-        axs[ihp_bottom].annotate(
-            '',
-            xy=(
-                (ihp * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp, 0]) +
-                 wtl * np.sum(syl[:ihp, 1])) / wt, y
-            ),
-            xytext=(
-                ((ihp + 1) * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp, 0]) +
-                 wtl * np.sum(syl[:ihp, 1])) / wt, y
-            ),
-            xycoords='figure fraction', textcoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': LWT, 'color': 'b', 'alpha': .5},
-        )
-
-        axs[ihp_bottom].annotate(
-            '',
-            xy=(
-                ((ihp + 1) * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp, 0]) +
-                 wtl * np.sum(syl[:ihp, 1])) / wt, y
-            ),
-            xytext=(
-                ((ihp + 1) * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp + 1, 0]) +
-                 wtl * np.sum(syl[:ihp, 1])) / wt, y
-            ),
-            xycoords='figure fraction', textcoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': LWT, 'color': 'b', 'alpha': .5},
-        )
-        axs[ihp_bottom].annotate(
-            '',
-            xy=(
-                ((ihp + 1) * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp + 1, 0]) +
-                 wtl * np.sum(syl[:ihp, 1])) / wt, y
-            ),
-            xytext=(
-                ((ihp + 1) * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp + 1, 0]) +
-                 wtl * np.sum(syl[:ihp + 1, 1])) / wt, y
-            ),
-            xycoords='figure fraction', textcoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': LWT, 'color': 'b', 'alpha': .5},
-        )
-        axs[ihp_bottom].annotate(
-            '',
-            xy=(
-                ((ihp + 1) * wfm + ihp * ws +
-                 wyl * np.sum(syl[:ihp + 1, 0]) +
-                 wtl * np.sum(syl[:ihp + 1, 1])) / wt, y
-            ),
-            xytext=(
-                ((ihp + 1) * wfm + (ihp + 1) * ws +
-                 wyl * np.sum(syl[:ihp + 1, 0]) +
-                 wtl * np.sum(syl[:ihp + 1, 1])) / wt, y
-            ),
-            xycoords='figure fraction', textcoords='figure fraction',
-            arrowprops={'arrowstyle': '<->', 'shrinkA': 0, 'shrinkB': 0,
-                        'linewidth': LWT, 'color': 'b', 'alpha': .5},
-        )
-    return axs
-
-def draw_dimensions(show, axs, n_panel_horizontal, n_panel_vertical,
-                    show_yaxis_label_ticks_g, show_xaxis_label_ticks_g,
-                    dimensions, i):
-    if show:
-        axs = y_scales(
-            n_panel_horizontal, n_panel_vertical, axs,
-            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
-            dimensions
-        )
-        axs = x_scales(
-            n_panel_horizontal, n_panel_vertical, axs,
-            show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
-            dimensions
-        )
-    return axs
-
-
-"""
