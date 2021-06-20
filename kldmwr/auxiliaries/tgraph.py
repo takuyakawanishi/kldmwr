@@ -72,16 +72,6 @@ def color_palette_gs(steps, i):
     return gscls[i]
 
 
-def adjust_spines(ax, spines, pad):
-    for loc, spine in ax.spines.items():
-        if loc in spines:
-            spine.set_position(('outward', pad))
-            spine.set_linewidth(LWT)
-            spine.set_color(CSP)
-        else:
-            spine.set_color(None)
-
-
 def set_figure_dimensions_in_points():
     """ old ones
     ws = 54 # spine width (57, or 54)
@@ -98,20 +88,20 @@ def set_figure_dimensions_in_points():
     hsp = wsp     # spine pad height, subtract
     """
     dimensions = {
-        'wfm': 1,  # Width of figure margin
-        'hfm': 2,
+        'wfm': 4,  # Width of figure margin
+        'hfm': 4,
         'wpg': 4,  # Width of panel gap
         'hpg': 4,
         'ws': 72,
         'wl': 26,
         'wyl': 12,
-        'wtl': 14,  # 18 - wpg
+        'wtl': 14,  # 18 - wpg, 18 makes panel size * 0.25
         'hs': 72,
         'hl': 24,  # 24 * 3 / 4,
         'hxl': 12.0,
         'htl': 12.0,
-        'wsp': 4,
-        'hsp': 4,
+        'wsp': 0,
+        'hsp': 0,
         'wfg': 4,
         'hfg': 4,
     }
@@ -138,7 +128,7 @@ def calc_wt_ht(nhor, nver, syl, sxl, dimensions):
     return wt, ht
 
 
-def create_axes_in_points(nhor, nver, syl, sxl, dimensions, pad):
+def create_axes_in_points(nhor, nver, syl, sxl, dimensions):
     syl = np.array(syl)
     sxl = np.array(sxl)
     wfm = dimensions['wfm']
@@ -155,11 +145,9 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions, pad):
     htl = dimensions['htl']
     hsp = dimensions['hsp']
     #
-    yapad = 4
-    xapad = 4
-
     axs = []
     wt, ht = calc_wt_ht(nhor, nver, syl, sxl, dimensions)
+
     for ihor in range(nhor):
         for iver in range(nver):
             ax = [
@@ -170,8 +158,8 @@ def create_axes_in_points(nhor, nver, syl, sxl, dimensions, pad):
                 ht - ((iver + 1) * (hs + hpg) - hsp +
                 hxl * np.sum(sxl[:iver, 0]) +
                 htl * np.sum(sxl[:iver, 1])),
-                (ws - wsp) - pad,
-                (hs - hsp) - pad
+                (ws - wsp),
+                (hs - hsp)
             ]
             axs.append(ax)
     return axs
@@ -205,7 +193,7 @@ def create_figure(fig_width_in_points, fig_height_in_points, enlargement):
 
 def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
                 show_xaxis_label_ticks_g, dimensions, fig_width, fig_height,
-                whfigs, pad):
+                whfigs):
     axs_in_points = []
     for i in range(n_figures):
         n_panel_horizontal = len(show_yaxis_label_ticks_g[i, :, 0])
@@ -214,7 +202,7 @@ def create_axes(fig, n_figures, show_yaxis_label_ticks_g,
             create_axes_in_points(
                 n_panel_horizontal, n_panel_vertical,
                 show_yaxis_label_ticks_g[i], show_xaxis_label_ticks_g[i],
-                dimensions, pad
+                dimensions
             )
         )
 
@@ -249,7 +237,7 @@ class TFigure(object):
 
     def __init__(self, aspect_ratio=1, dimensions=None,
                  syltf=None, sxltf=None, enlargement=1.0,
-                 spines_to_pad=None, pad=None,
+                 spines_to_pad=None, wpad=None, hpad=None, pad=None
                  ):
 
         if syltf is None:
@@ -266,9 +254,14 @@ class TFigure(object):
         self.show_xaxis_label_ticks_figs = np.array(sxltf)
         self.enlargement = enlargement
 
-        self.pad = 0
+        self.spines_to_pad = spines_to_pad
+        if wpad is not None:
+            self.dimensions['wsp'] = wpad
+        if hpad is not None:
+            self.dimensions['hsp'] = hpad
         if pad is not None:
-            self.pad = pad
+            self.dimensions['wsp'] = pad
+            self.dimensions['hsp'] = pad
 
         self.n_figures = len(self.show_yaxis_label_ticks_figs)
         self.n_panels = []
@@ -306,15 +299,28 @@ class TFigure(object):
             self.dimensions, self.fig_width_in_points,
             self.fig_height_in_points,
             self.whfigs,
-            self.pad
         )
+
+        if spines_to_pad is not None:
+            self.select_and_pad_spines(spines_to_pad)
 
         self.set_default_properties()
 
-        if spines_to_pad is not None:
-            self.select_and_pad_spines(spines_to_pad, self.pad)
-
         self.show_tick_and_tick_labels_according_to_settings()
+
+    def adjust_spines(self, ax, spines):
+        for loc, spine in ax.spines.items():
+            if loc in spines:
+                pad = 0
+                if loc == 'bottom':
+                    pad = self.dimensions['wsp'] * self.enlargement
+                elif loc == 'left':
+                    pad = self.dimensions['hsp'] * self.enlargement
+                spine.set_position(('outward', pad))
+                spine.set_linewidth(LWT)
+                spine.set_color(CSP)
+            else:
+                spine.set_color(None)
 
     def set_default_properties(self):
         for i in range(self.n_figures):
@@ -323,17 +329,17 @@ class TFigure(object):
                     ax.spines[spine].set_linewidth(LWT)
                 ax.tick_params(
                     axis='both', which='both', width=LWT,
-                    direction='in', labelsize=FSTL
+                    direction='out', labelsize=FSTL
                 )
                 for tick in ax.get_yticklabels():
                     tick.set_fontname("Arial")
                 for tick in ax.get_xticklabels():
                     tick.set_fontname("Arial")
 
-    def select_and_pad_spines(self, spines, pad):
+    def select_and_pad_spines(self, spines):
         for i in range(self.n_figures):
             for i_ax, ax in enumerate(self.axs[i]):
-                adjust_spines(ax, spines, pad * self.enlargement)
+                self.adjust_spines(ax, spines)
                 ax.tick_params(
                     axis='both', which='both', width=LWT,
                     direction='out', labelsize=FSTL)
@@ -371,7 +377,7 @@ def main():
         enlargement=1.2,
         sxltf=[[[0, 0], [1, 1]], [[0, 0], [1, 1]]],
         syltf=[[[1, 1], [0, 0]], [[1, 1], [0, 0]]],
-        spines_to_pad=['bottom', 'left'], pad=4
+        spines_to_pad=['bottom', 'left'], wpad=6, hpad=6
     )
     print(fig.show_xaxis_label_ticks_figs, fig.show_yaxis_label_ticks_figs)
     print('119 mm wide and not higher than 195 mm.')
@@ -389,10 +395,10 @@ def main():
             print(ax)
     ws = fig.dimensions['ws']
     wl = fig.dimensions['wl']
-    wax = ws - fig.pad
-    wltp = wl + fig.pad
+    wax = ws - fig.dimensions['wsp']
+    wltp = wl + fig.dimensions['wsp']
     el = wltp / wax
-    print(ws, wl, wltp, fig.pad)
+    print(ws, wl, wltp, fig.dimensions['wsp'])
     print(el)
     ax = fig.axs[0][0]
     ax.annotate('$a$', xy=(0, 0), xytext=(-el, 0.5),
