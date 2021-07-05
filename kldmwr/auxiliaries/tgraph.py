@@ -396,7 +396,7 @@ class TFigure(object):
             text, xy=(0, 0), xytext=(0.5, pxl),
             xycoords='axes fraction', textcoords='axes fraction',
             ha='left', va='center',
-            fontsize=fontsize, rotation=90
+            fontsize=fontsize, rotation=0
         )
         return ax
 
