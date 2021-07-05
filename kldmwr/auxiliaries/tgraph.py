@@ -395,7 +395,7 @@ class TFigure(object):
         ax.annotate(
             text, xy=(0, 0), xytext=(0.5, pxl),
             xycoords='axes fraction', textcoords='axes fraction',
-            ha='left', va='center',
+            ha='center', va='bottom',
             fontsize=fontsize, rotation=0
         )
         return ax
