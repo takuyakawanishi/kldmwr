@@ -88,22 +88,22 @@ def set_figure_dimensions_in_points():
     hsp = wsp     # spine pad height, subtract
     """
     dimensions = {
-        'wom': 4,  # Width of outer margin
-        'hom': 4,  # Width of outer margin
-        'wfm': 0,  # Width of figure margin
-        'hfm': 0,
+        'wom': 0,  # Width of outer margin
+        'hom': 0,  # Width of outer margin
+        'wfm': 4,  # Width of figure margin
+        'hfm': 4,
         'wpg': 4,  # Width of panel gap
         'hpg': 4,
         'ws': 72,
-        'wyl': 12,
-        'wtl': 14,  # 18 - wpg, 18 makes panel size * 0.25
+        'wyl': 7,
+        'wtl': 20,  # 24 - wpg, 24 makes panel width * 1 / 3
         'hs': 72,
         'hxl': 12,
         'htl': 12,
         'wsp': 0,
         'hsp': 0,
-        'wfg': 4,  # Width of figure gap
-        'hfg': 4,  # Height of panel gap
+        'wfg': 8,  # Width of figure gap
+        'hfg': 8,  # Height of panel gap
     }
     dimensions['wl'] = dimensions['wyl'] + dimensions['wtl']
     dimensions['hl'] = dimensions['hxl'] + dimensions['htl']
@@ -375,6 +375,30 @@ class TFigure(object):
                     self.show_yaxis_label_ticks_figs[i, ihor, 1]
                 )
 
+    def set_ylabel_ale(self, ax, text, fontsize=7):
+        wax = self.dimensions['ws'] - self.dimensions['wsp']
+        wltp = self.dimensions['wyl'] + self.dimensions['wtl'] + \
+               self.dimensions['wsp']
+        pyl = - wltp / wax
+        ax.annotate(
+            text, xy=(0, 0), xytext=(pyl, 0.5), xycoords='axes fraction',
+            textcoords='axes fraction', ha='left', va='center',
+            fontsize=fontsize, rotation=90
+        )
+        return ax
+
+    def set_xlabel_ale(self, ax, text, fontsize=7):
+        hax = self.dimensions['hs'] - self.dimensions['hsp']
+        hltp = self.dimensions['hxl'] + self.dimensions['htl'] + \
+               self.dimensions['hsp']
+        pxl = - hltp / hax
+        ax.annotate(
+            text, xy=(0, 0), xytext=(0.5, pxl),
+            xycoords='axes fraction', textcoords='axes fraction',
+            ha='left', va='center',
+            fontsize=fontsize, rotation=90
+        )
+        return ax
 
 def main():
 
@@ -397,7 +421,8 @@ def main():
     for axfig in fig.axs:
         for ax in axfig:
             ax.xaxis.set_minor_locator(AutoMinorLocator())
-            # print(ax)
+            fig.set_ylabel_ale(ax, '$\\mathit{a}$')
+            fig.set_xlabel_ale(ax, '$\\mathit{b}$')
     ws = fig.dimensions['ws']
     wl = fig.dimensions['wl']
     wax = ws - fig.dimensions['wsp']
@@ -434,6 +459,16 @@ def main():
     print(s_h)
 
     print(fig.whfigs)
+
+    wax = fig.dimensions['ws'] - fig.dimensions['wsp']
+    wltp = fig.dimensions['wyl'] + fig.dimensions['wtl'] + \
+           fig.dimensions['wsp']
+    pyl = - wltp / wax
+    hax = fig.dimensions['hs'] - fig.dimensions['hsp']
+    hltp = fig.dimensions['hxl'] + fig.dimensions['htl'] + \
+           fig.dimensions['hsp']
+    pxl = - hltp / hax
+
     plt.show()
 
 
