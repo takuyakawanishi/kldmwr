@@ -35,6 +35,11 @@ class TestUniverWeights(unittest.TestCase):
         w_nbc_expctd = [1, 1, 2, 1, 3, 1, 1]
         np.testing.assert_almost_equal(w_nbc, w_nbc_expctd, decimal=4)
 
+    def test_weights_nbc_2(self):
+        w_zbc = univar.weights_nbc_2(self.cnt)
+        w_zbc_expctd = [1, 1., 1.5, 1.5, 2., 2., 1]
+        np.testing.assert_equal(w_zbc, w_zbc_expctd)
+
 
 class TestUniverCalcs(unittest.TestCase):
 

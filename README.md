@@ -164,6 +164,15 @@ We do the following:
     
     # res_a[0] [ 1.2789668   0.56955288 -2.57856013]
 
+
+## Notes
+
+### How we handle the tied values
+
+
+
+
+
 ## Reference
 
 Jiang, R. “A Modified MPS Method for Fitting the 3-Parameter Weibull Distribution,” 983–85, 2013. https://doi.org/10.1109/QR2MSE.2013.6625731.
