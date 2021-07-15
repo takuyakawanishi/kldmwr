@@ -23,6 +23,16 @@ def weights_nbc(counts):
     return wn
 
 
+def weights_nbc_2(counts):
+    wz = np.zeros(len(counts) + 1)
+    wz[: -1] = counts
+    wz[1:] += counts
+    wz = 0.5 * wz
+    wz[0] = wz[0] + 0.5
+    wz[-1] = wz[-1] + 0.5
+    return wz
+
+
 def calc_ls(p, x_unq, cdf, wgt, vtxvals):
     vtxvals[1: -1] = cdf(x_unq, p)
     sps = np.diff(vtxvals)
@@ -100,7 +110,8 @@ def find_minimizer(
     if variant is 'zbc':
         wgt[:] = weights_zbc(cnt)
     elif variant is 'nbc':
-        wgt[:] = weights_nbc(cnt)
+        wgt[:] = weights_nbc_2(cnt)
+        # wgt[:] = weights_nbc(cnt)
     elif variant is 'ml':
         wgt = np.copy(cnt)
         vtxvals = np.zeros(len(x_unq))
@@ -199,7 +210,7 @@ def find_lsn(x, p, cdf):
     return find_minimizer(x, p, calc_ls, cdf, variant='nbc')
 
 
-def find_glz(x, p, cdf, ipf=None):
+def find_zge(x, p, cdf, ipf=None):
     """Returns the ZBGE.
 
     Parameters
@@ -230,7 +241,7 @@ def find_glz(x, p, cdf, ipf=None):
 
 
 
-def find_gln(x, p, cdf, ipf=None):
+def find_nge(x, p, cdf, ipf=None):
     """Returns the MPSE or NBGE.
 
     Parameters
@@ -265,10 +276,13 @@ def calc_mse(x, x_0):
 #
 # Aliases
 #
-find_jmmpse = find_glz
-find_zge = find_glz
-find_mpse = find_gln
-find_nge = find_gln
+find_jmmpse = find_zge
+find_glz = find_zge
+find_mpse = find_nge
+find_gln = find_nge
+
+
+
 ########################################
 # Utilities
 ########################################
