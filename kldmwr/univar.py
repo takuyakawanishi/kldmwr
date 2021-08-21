@@ -352,8 +352,6 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
 ########################################
 
 
-
-
 def log_likelihood(x, p, pdf):
     return np.sum(np.log(pdf(x, p)))
 
@@ -421,7 +419,7 @@ def calc_kld_nbc(x, p, cdf):
     vtxvals = np.zeros(len(x_unq) + 2)
     vtxvals[-1] = 1.
     wgt = np.zeros(len(x_unq) + 1)
-    wgt[:] = weights_nbc(cnt)
+    wgt[:] = weights_nbc_2(cnt)
     gl = calc_gl(p, x_unq, cdf, wgt, vtxvals)
     kld = (gl + (len(x) + 1) * np.log(1 / (len(x) + 1))) / (len(x) + 1)
     return kld
