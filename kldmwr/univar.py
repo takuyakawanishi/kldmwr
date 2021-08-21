@@ -240,7 +240,6 @@ def find_zge(x, p, cdf, ipf=None):
             x, p, calc_gl_ipf, cdf, variant='zbc', ipf=ipf)
 
 
-
 def find_nge(x, p, cdf, ipf=None):
     """Returns the MPSE or NBGE.
 
@@ -280,7 +279,6 @@ find_jmmpse = find_zge
 find_glz = find_zge
 find_mpse = find_nge
 find_gln = find_nge
-
 
 
 ########################################
@@ -354,6 +352,8 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
 ########################################
 
 
+
+
 def log_likelihood(x, p, pdf):
     return np.sum(np.log(pdf(x, p)))
 
@@ -403,3 +403,27 @@ def calc_h(x, p_ref, pdf, cdf):
     wgt[-1] = 0.5
     b = np.dot(wgt, np.log(edxs))
     return a - b / (n + 1)
+
+
+def calc_kld_zbc(x, p, cdf):
+    x_unq, cnt = np.unique(x, return_counts=True)
+    vtxvals = np.zeros(len(x_unq) + 2)
+    vtxvals[-1] = 1.
+    wgt = np.zeros(len(x_unq) + 1)
+    wgt[:] = weights_zbc(cnt)
+    gl = calc_gl(p, x_unq, cdf, wgt, vtxvals)
+    kld = (gl + len(x) * np.log(1 / (len(x) + 1))) / (len(x) + 1)
+    return kld
+
+
+def calc_kld_nbc(x, p, cdf):
+    x_unq, cnt = np.unique(x, return_counts=True)
+    vtxvals = np.zeros(len(x_unq) + 2)
+    vtxvals[-1] = 1.
+    wgt = np.zeros(len(x_unq) + 1)
+    wgt[:] = weights_nbc(cnt)
+    gl = calc_gl(p, x_unq, cdf, wgt, vtxvals)
+    kld = (gl + (len(x) + 1) * np.log(1 / (len(x) + 1))) / (len(x) + 1)
+    return kld
+
+
