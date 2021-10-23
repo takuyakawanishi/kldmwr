@@ -16,11 +16,12 @@ def weights_zbc(counts):
     return 0.5 * wz
 
 
-def weights_nbc(counts):
-    wn = np.zeros(len(counts) + 1)
-    wn[: -1] = counts
-    wn[-1] = 1
-    return wn
+# Depreciated
+# def weights_nbc(counts):
+#    wn = np.zeros(len(counts) + 1)
+#    wn[: -1] = counts
+#    wn[-1] = 1
+#    return wn
 
 
 def weights_nbc_2(counts):
@@ -98,7 +99,7 @@ def find_minimizer(
     Returns
     -------
     list
-       a list of objects of the results of the minimizing.
+       a list of objects of the results of the minimizing.d
        (the array of estimated parameters, negative kldmwr value of
        the function to_be_minimized, boolean: success or not,
        the whole results of the scipy.optimize.minimize function)

@@ -30,10 +30,11 @@ class TestUniverWeights(unittest.TestCase):
         w_zbc_expctd = [0.5, 1., 1.5, 1.5, 2., 2., 0.5]
         np.testing.assert_equal(w_zbc, w_zbc_expctd)
 
-    def test_weights_nbc(self):
-        w_nbc = univar.weights_nbc(self.cnt)
-        w_nbc_expctd = [1, 1, 2, 1, 3, 1, 1]
-        np.testing.assert_almost_equal(w_nbc, w_nbc_expctd, decimal=4)
+    # Depreciated.
+    # def test_weights_nbc(self):
+    #    w_nbc = univar.weights_nbc(self.cnt)
+    #    w_nbc_expctd = [1, 1, 2, 1, 3, 1, 1]
+    #    np.testing.assert_almost_equal(w_nbc, w_nbc_expctd, decimal=4)
 
     def test_weights_nbc_2(self):
         w_zbc = univar.weights_nbc_2(self.cnt)
