@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c39299b7-5ce7-4e6b-a47f-c6e01f8f047a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/test_dev_deriv.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/kldmwr/univar.py" beforeDir="false" afterPath="$PROJECT_DIR$/kldmwr/univar.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_dev_deriv.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_dev_deriv.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,21 +55,7 @@
       <recent name="$PROJECT_DIR$/kldmwr" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Unittests in test_dev_deriv.py">
-    <configuration name="Unittests for test_dev_deriv.TestUniverDerivs" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
-      <module name="kldmwr" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_dev_deriv.TestUniverDerivs&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python tests.Unittests for test_dev_deriv.TestUniverDerivs.test_calc_lps_2nd_deriv">
     <configuration name="Unittests for test_dev_deriv.TestUniverDerivs.test_calc_dd_1st_derivs" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
       <module name="kldmwr" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -96,6 +81,20 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
       <option name="_new_target" value="&quot;test_dev_deriv.TestUniverDerivs.test_calc_dd_2nd_derivs&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unittests for test_dev_deriv.TestUniverDerivs.test_calc_lps_2nd_deriv" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
+      <module name="kldmwr" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_dev_deriv.TestUniverDerivs.test_calc_lps_2nd_deriv&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -129,11 +128,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Unittests for test_dev_deriv.TestUniverDerivs.test_calc_lps_2nd_deriv" />
         <item itemvalue="Python tests.Unittests in test_dev_deriv.py" />
         <item itemvalue="Python tests.Unittests for test_dev_deriv.TestUniverDerivs.test_calc_dd_1st_derivs" />
         <item itemvalue="Python tests.Unittests for test_dev_deriv.TestUniverDerivs.test_calc_dd_2nd_derivs" />
         <item itemvalue="Python tests.Unittests for test_dev_deriv.TestUniverDerivs.test_calc_lps_2nd_deriv_terms" />
-        <item itemvalue="Python tests.Unittests for test_dev_deriv.TestUniverDerivs" />
       </list>
     </recent_temporary>
   </component>

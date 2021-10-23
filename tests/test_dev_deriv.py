@@ -1,9 +1,6 @@
 import unittest
 import numpy as np
 from kldmwr import univar
-from kldmwr.distributions import *
-
-
 class TestUniverDerivs(unittest.TestCase):
 
     def setUp(self):
@@ -82,14 +79,19 @@ class TestUniverDerivs(unittest.TestCase):
         np.testing.assert_almost_equal(res_test, res_expt, decimal=4)
 
     def test_calc_lps_2nd_deriv(self):
+        wgt = np.array([0.5, 1., 1., 1., 0.5])
         res_test = univar.calc_lps_2nd_deriv(
-            self.x, self.p_hat, tpw_cdf, self.ps, self.pps)
+            self.x, self.p_hat, tpw_cdf, self.ps, self.pps, wgt)
         res_expt = np.array(
-            [[-2.69084604, -1.8593671, -0.1628983],
-             [-1.8593671 , -1.92530087,  0.00834586],
-             [-0.1628983 ,  0.00834586, -0.0375215]])
+            [[-5.50248977, -4.70290094, -0.33172919],
+             [-4.70290094, -3.87429813, -0.0943862 ],
+             [-0.33172919, -0.0943862 , -0.09183932]]
+        )
         np.testing.assert_almost_equal(res_test, res_expt, decimal=4)
 
 
 if __name__ == '__main__':
     unittest.main()
+
+
+from kldmwr.distributions import *
