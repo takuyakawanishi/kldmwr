@@ -426,3 +426,48 @@ def calc_kld_nbc(x, p, cdf):
     return kld
 
 
+########################################
+# Derivative masrices
+########################################
+
+def calc_dds(x_unq, p_hat, cdf):
+    eff = np.append([0], np.append(cdf(x_unq, p_hat), [1]))
+    return np.diff(eff)
+
+
+def calc_diffs_for_derivs(x_unq, p_hat, derivative):
+    edd_deriv = np.append([0], np.append(derivative(x_unq, p_hat), [0]))
+    return np.diff(edd_deriv)
+
+
+def calc_dd_1st_derivs(x_unq, p_hat, cdf, cdf_1st_derivs):
+    d_par = len(cdf_1st_derivs)
+    dds = calc_dds(x_unq, p_hat, cdf)
+    dd_p_s = np.zeros((len(x_unq) + 1, d_par))
+    for i in range(d_par):
+        dd_p_s[:, i] = calc_diffs_for_derivs(x_unq, p_hat, cdf_1st_derivs[i])
+    return dd_p_s
+
+
+def calc_dd_2nd_derivs(x_unq, p_hat, cdf, cdf_2nd_derivs):
+    d_par = len(cdf_2nd_derivs)
+    dds = calc_dds(x_unq, p_hat, cdf)
+    dd_pp_s = np.zeros((len(x_unq) + 1, d_par, d_par))
+    for i in range(d_par):
+        for j in range(d_par):
+            dd_pp_s[:, i, j] = calc_diffs_for_derivs(x_unq, p_hat,
+                                                     cdf_2nd_derivs[i][j])
+    return dd_pp_s
+
+
+def calc_lps_2nd_deriv_terms(x_unq, p_hat, cdf, cdf_1st_derivs, cdf_2nd_derivs):
+    dd_p_s = calc_dd_1st_derivs(x_unq, p_hat, cdf, cdf_1st_derivs)
+    dd_pp_s = calc_dd_2nd_derivs(x_unq, p_hat, cdf, cdf_2nd_derivs)
+    dd_p_s_sqr = np.einsum('ij,ik->ijk', dd_p_s, dd_p_s)
+    return dd_pp_s - dd_p_s_sqr
+
+
+def calc_lps_2nd_deriv(x_unq, p_hat, cdf, cdf_1st_derivs, cdf_2nd_derivs):
+    a = calc_lps_2nd_deriv_terms(x_unq, p_hat, cdf, cdf_1st_derivs,
+                                 cdf_2nd_derivs)
+    return np.sum(a, axis=0)
