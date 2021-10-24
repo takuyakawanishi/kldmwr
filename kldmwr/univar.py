@@ -443,20 +443,23 @@ def calc_diffs_for_derivs(x_unq, p_hat, derivative):
 def calc_dd_1st_derivs(x_unq, p_hat, cdf, cdf_1st_derivs):
     d_par = len(cdf_1st_derivs)
     dds = calc_dds(x_unq, p_hat, cdf)
+    ff_p_s = np.zeros((len(x_unq) + 1, d_par))
     dd_p_s = np.zeros((len(x_unq) + 1, d_par))
     for i in range(d_par):
-        dd_p_s[:, i] = calc_diffs_for_derivs(x_unq, p_hat, cdf_1st_derivs[i])
+        ff_p_s[:, i] = calc_diffs_for_derivs(x_unq, p_hat, cdf_1st_derivs[i])
+        dd_p_s[:, i] = np.divide(ff_p_s[:, i], dds)
     return dd_p_s
 
 
 def calc_dd_2nd_derivs(x_unq, p_hat, cdf, cdf_2nd_derivs):
     d_par = len(cdf_2nd_derivs)
     dds = calc_dds(x_unq, p_hat, cdf)
+    ff_pp_s = np.zeros((len(x_unq) + 1, d_par, d_par))
     dd_pp_s = np.zeros((len(x_unq) + 1, d_par, d_par))
     for i in range(d_par):
         for j in range(d_par):
-            dd_pp_s[:, i, j] = calc_diffs_for_derivs(x_unq, p_hat,
-                                                     cdf_2nd_derivs[i][j])
+            ff_pp_s[:, i, j] = calc_diffs_for_derivs(x_unq, p_hat, cdf_2nd_derivs[i][j])
+            dd_pp_s[:, i, j] = np.divide(ff_pp_s[:, i, j], dds)
     return dd_pp_s
 
 
