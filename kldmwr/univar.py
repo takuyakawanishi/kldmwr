@@ -477,3 +477,13 @@ def calc_lps_2nd_deriv(x_unq, p_hat, cdf, cdf_1st_derivs, cdf_2nd_derivs, wgt):
     wgt_mat = np.einsum('i,j,k->ijk', wgt, k, k)
     b = wgt_mat * a
     return np.sum(b, axis=0)
+
+
+def calc_lps_2nd_deriv_wo_first(
+        x_unq, p_hat, cdf, cdf_1st_derivs, cdf_2nd_derivs, wgt):
+    d_par = len(cdf_2nd_derivs)
+    a = calc_lps_2nd_deriv_terms(x_unq, p_hat,cdf, cdf_1st_derivs, cdf_2nd_derivs)
+    k = np.ones(d_par)
+    wgt_mat = np.einsum('i,j,k->ijk', wgt, k, k)
+    b = wgt_mat * a
+    return np.sum(b[1:], axis=0)

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='kldmwr',  # Required
-    version='0.7.2',  # Required
+    version='0.7.2.a',  # Required
     description="Parameter Estimation Library Based on KLDMWR Framework",
     url='https://github.com/takuyakawanishi/kldmwr',
     author='Takuya Kawanishi',
