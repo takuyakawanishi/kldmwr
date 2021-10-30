@@ -63,14 +63,6 @@ class TestCalcDerivativesOfh(unittest.TestCase):
         # print(h_sgsg_fml)
         np.testing.assert_allclose(h_sgsg_fml, h_sgsg_num, rtol=self.rtol_set)
 
-    def test_calc_h_xixi(self):
-        h_xixi_num = (gev.calc_h_xi(self.x, self.ppdxi) -
-                      gev.calc_h_xi(self.x, self.p_0)) / self.dlt
-        h_xixi_fml = gev.calc_h_xixi(self.x, self.p_0)
-        # print(h_xixi_num)
-        # print(h_xixi_fml)
-        np.testing.assert_allclose(h_xixi_fml, h_xixi_num, rtol=self.rtol_set)
-
     def test_calc_h_musg(self):
         h_musg_num = (gev.calc_h_mu(self.x, self.ppdsg) -
                       gev.calc_h_mu(self.x, self.p_0)) / self.dlt
@@ -131,14 +123,6 @@ class TestCalcDerivativesOfG(unittest.TestCase):
         # print(h_sg_fml)
         np.testing.assert_allclose(gg_sg_fml, gg_sg_num, rtol=self.rtol_set)
 
-    def test_calc_h_xi(self):
-        gg_xi_num = (gev.calc_gg(self.x, self.ppdxi) -
-                     gev.calc_gg(self.x, self.p_0)) / self.dlt
-        gg_xi_fml = gev.calc_gg_xi(self.x, self.p_0)
-        # print(h_xi_num)
-        # print(h_xi_fml)
-        np.testing.assert_allclose(gg_xi_fml, gg_xi_num, rtol=self.rtol_set)
-
     def test_calc_gg_mumu(self):
         gg_mumu_num = (gev.calc_gg_mu(self.x, self.ppdmu) -
                        gev.calc_gg_mu(self.x, self.p_0)) / self.dlt
@@ -154,14 +138,6 @@ class TestCalcDerivativesOfG(unittest.TestCase):
         # print(gg_sgsg_num)
         # print(gg_sgsg_fml)
         np.testing.assert_allclose(gg_sgsg_fml, gg_sgsg_num, rtol=self.rtol_set)
-
-    def test_calc_gg_xixi(self):
-        gg_xixi_num = (gev.calc_gg_xi(self.x, self.ppdxi) -
-                       gev.calc_gg_xi(self.x, self.p_0)) / self.dlt
-        gg_xixi_fml = gev.calc_gg_xixi(self.x, self.p_0)
-        # print(gg_xixi_num)
-        # print(gg_xixi_fml)
-        np.testing.assert_allclose(gg_xixi_fml, gg_xixi_num, rtol=self.rtol_set)
 
     def test_calc_gg_musg(self):
         gg_musg_num = (gev.calc_gg_mu(self.x, self.ppdsg) -
@@ -335,6 +311,156 @@ class TestCalcOfDs(unittest.TestCase):
              [-58.96696857, -28.16324933, -20.62277544]]
         )
         np.testing.assert_almost_equal(l_pp, l_pp_exp, decimal=6)
+
+
+class TestDerivativeGxixi(unittest.TestCase):
+    def setUp(self):
+        xi = np.random.uniform(-2, 2)
+        # print(xi)
+        self.p_0 = np.array([1, 1, xi])
+        self.x = distributions.gev_sampling(1, 4, self.p_0)
+        self.dlt = 1e-10
+        self.rtol_set = 1e-2
+        self.pmu = self.p_0 + np.array([self.dlt, 0, 0])
+        self.psg = self.p_0 + np.array([0, self.dlt, 0])
+        self.pxi = self.p_0 + np.array([0, 0, self.dlt])
+        self.mmu = self.p_0 - np.array([self.dlt, 0, 0])
+        self.msg = self.p_0 - np.array([0, self.dlt, 0])
+        self.mxi = self.p_0 - np.array([0, 0, self.dlt])
+
+    def test_calc_gg_xi(self):
+        gg_xi_num = (gev.calc_gg(self.x, self.pxi) -
+                     gev.calc_gg(self.x, self.mxi)) / (2 * self.dlt)
+        gg_xi_fml = gev.calc_gg_xi(self.x, self.p_0)
+        np.testing.assert_allclose(gg_xi_fml, gg_xi_num, rtol=self.rtol_set)
+
+    def test_calc_gg_xixi(self):
+        gg_xixi_num = (gev.calc_gg_xi(self.x, self.pxi) -
+                       gev.calc_gg_xi(self.x, self.mxi)) / (2 * self.dlt)
+        gg_xixi_fml = gev.calc_gg_xixi(self.x, self.p_0)
+        np.testing.assert_allclose(gg_xixi_fml, gg_xixi_num, rtol=self.rtol_set)
+
+    def test_calc_h_xixi(self):
+        h_xixi_num = (gev.calc_h_xi(self.x, self.pxi) -
+                      gev.calc_h_xi(self.x, self.mxi)) / (2 * self.dlt)
+        h_xixi_fml = gev.calc_h_xixi(self.x, self.p_0)
+        np.testing.assert_allclose(h_xixi_fml, h_xixi_num, rtol=self.rtol_set)
+
+
+class TestDerivativesLogLikelihood(unittest.TestCase):
+    def setUp(self):
+        xi = np.random.uniform(-2, 2)
+        # print(xi)
+        self.p_0 = np.array([1, 1, xi])
+        self.x = distributions.gev_sampling(1, 4, self.p_0)
+        self.dlt = 1e-8
+        self.rtol_set = 1e-3
+        self.pmu = self.p_0 + np.array([self.dlt, 0, 0])
+        self.psg = self.p_0 + np.array([0, self.dlt, 0])
+        self.pxi = self.p_0 + np.array([0, 0, self.dlt])
+        self.mmu = self.p_0 - np.array([self.dlt, 0, 0])
+        self.msg = self.p_0 - np.array([0, self.dlt, 0])
+        self.mxi = self.p_0 - np.array([0, 0, self.dlt])
+
+    def test_gev_pdf_mu(self):
+        gev_pdf_mu_num = \
+            (gev.gev_pdf(self.x, self.pmu) - gev.gev_pdf(self.x, self.mmu)) /\
+            (2 * self.dlt)
+        gev_pdf_mu_frm = gev.gev_pdf_mu(self.x, self.p_0)
+        np.testing.assert_allclose(gev_pdf_mu_num, gev_pdf_mu_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_pdf_sg(self):
+        gev_pdf_sg_num = \
+            (gev.gev_pdf(self.x, self.psg) - gev.gev_pdf(self.x, self.msg)) /\
+            (2 * self.dlt)
+        gev_pdf_sg_frm = gev.gev_pdf_sg(self.x, self.p_0)
+        np.testing.assert_allclose(gev_pdf_sg_num, gev_pdf_sg_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_pdf_xi(self):
+        gev_pdf_xi_num = \
+            (gev.gev_pdf(self.x, self.pxi) - gev.gev_pdf(self.x, self.mxi)) /\
+            (2 * self.dlt)
+        gev_pdf_xi_frm = gev.gev_pdf_xi(self.x, self.p_0)
+        np.testing.assert_allclose(gev_pdf_xi_num, gev_pdf_xi_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l(self):
+        gev_l_dst = np.log(distributions.gev_pdf(self.x, self.p_0))
+        gev_l_gev = gev.gev_l(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_dst, gev_l_gev, rtol=self.rtol_set)
+
+    def test_gev_l_mu(self):
+        gev_l_mu_num = \
+            (gev.gev_l(self.x, self.pmu) - gev.gev_l(self.x, self.mmu)) /\
+            (2 * self.dlt)
+        gev_l_mu_frm = gev.gev_l_mu(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_mu_num, gev_l_mu_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l_sg(self):
+        gev_l_sg_num = \
+            (gev.gev_l(self.x, self.psg) - gev.gev_l(self.x, self.msg)) /\
+            (2 * self.dlt)
+        gev_l_sg_frm = gev.gev_l_sg(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_sg_num, gev_l_sg_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l_xi(self):
+        gev_l_xi_num = \
+            (gev.gev_l(self.x, self.pxi) - gev.gev_l(self.x, self.mxi)) /\
+            (2 * self.dlt)
+        gev_l_xi_frm = gev.gev_l_xi(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_xi_num, gev_l_xi_frm,
+                                   rtol=self.rtol_set)
+    def test_gev_l_mumu(self):
+        gev_l_mumu_num = \
+            (gev.gev_l_mu(self.x, self.pmu) - gev.gev_l_mu(self.x, self.mmu)) /\
+            (2 * self.dlt)
+        gev_l_mumu_frm = gev.gev_l_mumu(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_mumu_num, gev_l_mumu_frm,
+                                   rtol=self.rtol_set)
+        
+    def test_gev_l_musg(self):
+        gev_l_musg_num = \
+            (gev.gev_l_mu(self.x, self.psg) - gev.gev_l_mu(self.x, self.msg)) /\
+            (2 * self.dlt)
+        gev_l_musg_frm = gev.gev_l_musg(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_musg_num, gev_l_musg_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l_muxi(self):
+        gev_l_muxi_num = \
+            (gev.gev_l_mu(self.x, self.pxi) - gev.gev_l_mu(self.x, self.mxi)) /\
+            (2 * self.dlt)
+        gev_l_muxi_frm = gev.gev_l_muxi(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_muxi_num, gev_l_muxi_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l_sgsg(self):
+        gev_l_sgsg_num = \
+            (gev.gev_l_sg(self.x, self.psg) - gev.gev_l_sg(self.x, self.msg)) /\
+            (2 * self.dlt)
+        gev_l_sgsg_frm = gev.gev_l_sgsg(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_sgsg_num, gev_l_sgsg_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l_sgxi(self):
+        gev_l_sgxi_num = \
+            (gev.gev_l_sg(self.x, self.pxi) - gev.gev_l_sg(self.x, self.mxi)) / \
+            (2 * self.dlt)
+        gev_l_sgxi_frm = gev.gev_l_sgxi(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_sgxi_num, gev_l_sgxi_frm,
+                                   rtol=self.rtol_set)
+
+    def test_gev_l_xixi(self):
+        gev_l_xixi_num = \
+            (gev.gev_l_xi(self.x, self.pxi) - gev.gev_l_xi(self.x, self.mxi)) /\
+            (2 * self.dlt)
+        gev_l_xixi_frm = gev.gev_l_xixi(self.x, self.p_0)
+        np.testing.assert_allclose(gev_l_xixi_num, gev_l_xixi_frm,
+                                   rtol=self.rtol_set)
 
 
 if __name__ == '__main__':

@@ -223,3 +223,142 @@ def calc_dd_p_o_dd_sq_lp(xv, p):
     ys = np.array(ys)
     ys = np.transpose(ys, axes=[1, 2, 0])
     return ys
+
+
+
+def gev_cdf(x, p):
+    return distributions.gev_cdf(x, p)
+
+
+def gev_pdf(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    return 1 / p[1] * u ** (-1 / p[2] - 1) * distributions.gev_cdf(x, p)
+
+
+def gev_pdf_mu(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    return (
+        (p[2] + 1) / p[1] ** 2 * u ** (-1 / p[2] - 2)
+        - 1 / p[1] ** 2 * u ** (-2 / p[2] - 2)
+           ) * gev_cdf(x, p)
+
+
+def gev_pdf_sg(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    return (
+        - 1 / p[1] ** 2 * u ** (-1 / p[2] - 1)
+        + (1 + p[2]) / p[1] ** 2 * (x - p[0]) / p[1] * u**(-1 / p[2] - 2)
+        - 1 / p[1] ** 2 * (x - p[0]) / p[1] * u ** (-2 / p[2] - 2)
+           ) * gev_cdf(x, p)
+
+
+def gev_pdf_xi(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    return (
+                   1 / p[1] / p[2] ** 2 * np.log(u) * \
+                   (u ** (-1 / p[2] - 1) - u ** (-2 / p[2] - 1))
+                   + 1 / p[1] / p[2] * (x - p[0]) / p[1] * u ** (-2 / p[2] - 2)
+                   + 1 / p[1] * (- 1 / p[2] - 1) * (x - p[0]) / p[1] * u ** (
+                               -1 / p[2] - 2)
+           ) * gev_cdf(x, p)
+
+
+################################################################################
+# Derivatives of Log Likilihood
+################################################################################
+
+def gev_l(x, p):
+    return np.log(gev_pdf(x, p))
+
+
+def gev_l_mu(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    return (p[2] + 1) / p[1] * u ** (-1) - 1 / p[1] * u ** (-1 / p[2] - 1)
+
+
+def gev_l_sg(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = - 1 / p[1]
+    b = (1 + p[2]) / p[1] * (x - p[0]) / p[1] * \
+        u ** (-1)
+    c = - 1 / p[1] * (x - p[0]) / p[1] * u ** (-1 / p[2] - 1)
+    return a + b + c
+
+
+def gev_l_xi(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = 1 / p[2] ** 2 * np.log(u) * (1 - u ** (- 1 / p[2]))
+    b = 1 / p[2] * (x - p[0]) / p[1] * u ** (- 1 / p[2] - 1)
+    c = (-1 / p[2] - 1) * (x - p[0]) / p[1] * u ** (- 1)
+    return a + b + c
+
+
+def gev_l_mumu(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = p[2] * (1 + p[2]) / p[1] ** 2 * u ** (-2)
+    b = - (1 + p[2]) / p[1] ** 2 * u ** (-1 / p[2] - 2)
+    return a + b
+
+
+def gev_l_musg(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = - (1 + p[2]) / p[1] ** 2 * u ** (-1)
+    b = p[2] * (1 + p[2]) / p[1] ** 2 * y * u ** (-2)
+    c = 1 / p[1] ** 2 * u ** (-1 / p[2] - 1)
+    d = - (1 + p[2]) / p[1] ** 2 * y * u ** (-1 / p[2] - 2)
+    return a + b + c + d
+
+
+def gev_l_muxi(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = 1 / p[1] * u ** (-1)
+    b = - (1 + p[2]) / p[1] * y * u ** (-2)
+    c = - 1 / p[1] / p[2] ** 2 * np.log(u) * u ** (-1 / p[2] - 1)
+    d = (1 + p[2]) / p[1] / p[2] * y * u ** (-1 / p[2] - 2)
+    return a + b + c + d
+
+
+def gev_l_sgsg(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = 1 / p[1] ** 2
+    b = - 2 * (1 + p[2]) / p[1] ** 2 * y * u ** (-1)
+    c = p[2] * (1 + p[2]) / p[1] ** 2 * y ** 2 * u ** (-2)
+    d = 2 / p[1] ** 2 * y * u ** (-1 / p[2] - 1)
+    e = - (1 + p[2]) / p[1] ** 2 * y ** 2 * u ** (-1 / p[2] - 2)
+    return a + b + c + d + e
+
+
+def gev_l_sgxi(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = 1 / p[1] * y * u ** (-1)
+    b = - (1 + p[2]) / p[1] * y ** 2 * u ** (-2)
+    c = - 1 / p[1] / p[2] ** 2 * y * np.log(1 + p[2] * y) * u ** (-1 / p[2] - 1)
+    d = (1 + p[2]) / p[2] / p[1] * y ** 2 * u ** (-1 / p[2] - 2)
+    return a + b + c + d
+
+
+def gev_l_xixi(x, p):
+    y = (x - p[0]) / p[1]
+    u = 1 + p[2] * y
+    a = - 2 / p[2] ** 3 * np.log(u) * (1 - u ** (-1 / p[2]))
+    b = 1 / p[2] ** 2 * y / u * (1 - u ** (-1 / p[2]))
+    c = - 1 / p[2] ** 4 * np.log(u) * np.log(u) * u ** (-1 / p[2])
+    d = 1 / p[2] ** 3 * y * np.log(u) * u ** (-1 / p[2] - 1)
+    e = - 1 / p[2] ** 2 * y * u ** (-1 / p[2] - 1)
+    f = d
+    g = - (1 + p[2]) / p[2] ** 2 * y ** 2 * u ** (-1 / p[2] - 2)
+    h = 1 / p[2] ** 2 * y / u
+    i = (1 + p[2]) / p[2] * y ** 2 * u ** (-2)
+    return a + b + c + d + e + f + g + h + i
