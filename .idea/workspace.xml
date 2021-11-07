@@ -6,9 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c39299b7-5ce7-4e6b-a47f-c6e01f8f047a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kldmwr/gev.py" beforeDir="false" afterPath="$PROJECT_DIR$/kldmwr/gev.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_gev.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_gev.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/kldmwr/univar.py" beforeDir="false" afterPath="$PROJECT_DIR$/kldmwr/univar.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +42,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../trials_packages" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
