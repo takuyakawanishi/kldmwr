@@ -18,11 +18,6 @@ method of solving boundary value problems, is applied
 to the transformed KLD.
 
 
-The advantages of KLDMWR is stated in 
-Kawanishi (2021).
-
-
-
 * Maximum Likelihood Method
 * Maximum Product of Spacings Method
 * Zero-Boundary Galerkin Estimator (Jiang's version
@@ -74,7 +69,7 @@ We do the following:
     #              x: array([-0.11747087,  0.60645557]))
 
 
-#### ZGE (or Jiang's modified MPS Estimator, JMMPSE)
+#### KLDMWR-GE (KLEMWR-Galerkin estimator or Jiang's modified MPS estimator, JMMPSE)
 
     import kldmwr.univar
     import scipy.stats
@@ -86,13 +81,13 @@ We do the following:
     
     x = [0.12, -0.62, 1.16, -0.31, -0.02, -0.99, -0.45,  0.17]
     p_i = [0, 1]
-    res = kldmwr.univar.find_zge(x, p_i, norm_cdf)
+    res = kldmwr.univar.find_ge(x, p_i, norm_cdf)
     print(res[0])
 
     # [-0.13663485  0.62631407]
 
 
-#### NGE (or traditional MPS estimator)
+#### KLDMWR-SE (KLDMWR-subdomain estimator or traditional MPS estimator)
 
     import kldmwr.univar
     import scipy.stats
@@ -104,7 +99,7 @@ We do the following:
     
     x = [0.12, -0.62, 1.16, -0.31, -0.02, -0.99, -0.45,  0.17]
     p_i = [0, 1]
-    res = kldmwr.univar.find_nge(x, p_i, norm_cdf)
+    res = kldmwr.univar.find_se(x, p_i, norm_cdf)
     print(res[0])
 
     # [-0.11059383  0.80750186]
@@ -114,7 +109,7 @@ We do the following:
 
 ### Estimation with various initial sets of parameters
 
-#### GZE for the Generalized Extreme Value Distribution (GEVD)
+#### KLDMWR-GE for the Generalized Extreme Value Distribution (GEVD)
 
     import kldmwr.univar
     import numpy as np
@@ -156,7 +151,7 @@ We do the following:
     ################################################################################
     
     res_a = kldmwr.univar.find_min_viv_expl(
-        x, p_0, kldmwr.univar.find_zge, gev_cdf,
+        x, p_0, kldmwr.univar.find_ge, gev_cdf,
         p_ints=p_is
     )
     
