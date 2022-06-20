@@ -1,4 +1,4 @@
-"""Various methods of parameter estimation for univariate distributions.
+ """Various methods of parameter estimation for univariate distributions.
 
 This module provides some parameter estimation methods based on
 KLDMWR framework, for uni-variate probability distributions.
@@ -15,7 +15,6 @@ def weights_zbc(counts):
     wz[1:] += counts
     return 0.5 * wz
 
-
 # Depreciated
 # def weights_nbc(counts):
 #    wn = np.zeros(len(counts) + 1)
@@ -24,7 +23,7 @@ def weights_zbc(counts):
 #    return wn
 
 
-def weights_nbc_2(counts):
+def weights_nbc(counts):
     wz = np.zeros(len(counts) + 1)
     wz[: -1] = counts
     wz[1:] += counts
@@ -33,6 +32,7 @@ def weights_nbc_2(counts):
     wz[-1] = wz[-1] + 0.5
     return wz
 
+weights_nbc_2 = weights_nbc
 
 def calc_ls(p, x_unq, cdf, wgt, vtxvals):
     vtxvals[1: -1] = cdf(x_unq, p)
@@ -44,7 +44,7 @@ def calc_ls(p, x_unq, cdf, wgt, vtxvals):
 def calc_gl(p, x_unq, cdf, wgt, vtxvals):
     vtxvals[1: -1] = cdf(x_unq, p)
     sps = np.diff(vtxvals)
-    ls = np.log(sps)
+    ls = np.log(sps)test_univar
     return - np.dot(ls, wgt)
 
 
@@ -211,13 +211,13 @@ def find_lsn(x, p, cdf):
     return find_minimizer(x, p, calc_ls, cdf, variant='nbc')
 
 
-def find_zge(x, p, cdf, ipf=None):
+def find_ge(x, p, cdf, ipf=None):
     """Returns the ZBGE.
 
     Parameters
     ----------
     x : ndarray
-        1D array or a list of data, ties are allowed.
+        1D array or a list of data, ties aretest_univar allowed.
     p : ndarray
         1D array of parameter values
     cdf : function
@@ -228,7 +228,15 @@ def find_zge(x, p, cdf, ipf=None):
     Returns
     -------
     list :
-       a list of objects in finding ZBGE,
+       a list of objects in finding ZBGE,# Depreciated
+# def weights_nbc(counts):
+#    wn = np.zeros(len(counts) + 1)
+#    wn[: -1] = counts
+#    wn[-1] = 1
+#    return wn
+
+
+
        (the array of estimated parameters, negative maximum product
        of spacings, boolean indicating success or not,
        the whole results of the scipy.optimize.minimize function)
@@ -241,7 +249,7 @@ def find_zge(x, p, cdf, ipf=None):
             x, p, calc_gl_ipf, cdf, variant='zbc', ipf=ipf)
 
 
-def find_nge(x, p, cdf, ipf=None):
+def find_se(x, p, cdf, ipf=None):
     """Returns the MPSE or NBGE.
 
     Parameters
@@ -280,6 +288,12 @@ find_jmmpse = find_zge
 find_glz = find_zge
 find_mpse = find_nge
 find_gln = find_nge
+#
+# Aliases add after naming GE, SE, CE.
+#
+find_zge = find_ge
+find_nge = find_se
+find_ce = find_mle
 
 
 ########################################
