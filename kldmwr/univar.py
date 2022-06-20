@@ -44,7 +44,7 @@ def calc_ls(p, x_unq, cdf, wgt, vtxvals):
 def calc_gl(p, x_unq, cdf, wgt, vtxvals):
     vtxvals[1: -1] = cdf(x_unq, p)
     sps = np.diff(vtxvals)
-    ls = np.log(sps)test_univar
+    ls = np.log(sps)
     return - np.dot(ls, wgt)
 
 
