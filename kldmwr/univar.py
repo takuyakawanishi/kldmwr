@@ -1,4 +1,4 @@
- """Various methods of parameter estimation for univariate distributions.
+"""Various methods of parameter estimation for univariate distributions.
 
 This module provides some parameter estimation methods based on
 KLDMWR framework, for uni-variate probability distributions.
