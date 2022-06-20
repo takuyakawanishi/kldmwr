@@ -284,16 +284,12 @@ def calc_mse(x, x_0):
 #
 # Aliases
 #
-find_jmmpse = find_zge
-find_glz = find_zge
-find_mpse = find_nge
-find_gln = find_nge
-#
-# Aliases add after naming GE, SE, CE.
-#
+find_jmmpse = find_ge
+find_glz = find_ge
 find_zge = find_ge
+find_mpse = find_se
+find_gln = find_se
 find_nge = find_se
-find_ce = find_mle
 
 
 ########################################
