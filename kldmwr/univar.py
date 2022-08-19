@@ -297,13 +297,23 @@ find_nge = find_se
 ########################################
 
 
+def set_df_columns_min_viv(p):
+    columns = []
+    for i in range(len(p)):
+        columns = columns + ['par_hat_' + str(i)]
+    columns = columns + ['mmps', 'success']
+    for i in range(len(p)):
+        columns = columns + ['par_i_' + str(i)]
+    return columns
+
+
 def find_min_viv_expl(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
     """For backward compatibility, see find_min_viv
     """
     return find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=p_ints, ipf=ipf)
 
 
-def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
+def find_min_viv_tmp(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
     """Return the minimizer of the
 
     Parameters
@@ -328,18 +338,18 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
     success = False
     minimum = np.NaN
     df = None
-    ress = []
     count = 0
     count_same = 0
+    ress = []
     for p_int in p_ints:
         res = find_estimate(x, p_int, pdf_or_cdf, ipf)
         if res[2]:
             count += 1
-            ress.append(
-                np.append(res[0], np.append(res[1], np.append(res[2], p_int))))
+            contents = [*res[0], res[1], res[2], *p_int]
+            ress.append(contents)
             if 2 <= count:
                 if np.allclose(
-                        ress[count - 1][0:3], ress[count - 2][0:3], atol=1e-4):
+                        ress[count - 1][0:len(p)], ress[count - 2][0:len(p)], atol=1e-4):
                     count_same += 1
                 else:
                     count_same = 0
@@ -347,16 +357,17 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
             break
 
     if count != 0:
-        df = pd.DataFrame(ress)
-        df.columns = ['loc', 'scl', 'shp', 'mmps', 'success',
-                      'p_i_loc', 'p_i_scl', 'p_i_shp']
+        df_columns = set_df_columns_min_viv(p)
+        df = pd.DataFrame(ress, columns=df_columns)
         minv = df.iloc[df['mmps'].idxmin(), :]
-        res_x = np.array([minv['loc'], minv['scl'], minv['shp']])
+        res_x = []
+        for i in range(len(p)):
+            res_x.append([minv['par_hat_' + str(i)]])
+        res_x = np.array(res_x)
         minimum = minv['mmps']
         success = True
 
     return res_x, minimum, success, df
-
 
 ########################################
 # Trials
