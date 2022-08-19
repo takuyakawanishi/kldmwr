@@ -313,7 +313,7 @@ def find_min_viv_expl(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
     return find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=p_ints, ipf=ipf)
 
 
-def find_min_viv_tmp(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
+def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
     """Return the minimizer of the
 
     Parameters
