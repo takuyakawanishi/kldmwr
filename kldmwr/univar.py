@@ -448,7 +448,7 @@ def calc_kld_nbc(x, p, cdf):
 
 
 ########################################
-# Derivative masrices
+# Derivative matrices
 ########################################
 
 def calc_dds(x_unq, p_hat, cdf):
