@@ -31,7 +31,7 @@ to the transformed KLD.
 
 ## Basic Usage
 
-### Finding a Estimates
+### Finding Estimates
 
 We do the following:
 * Define the pdf or cdf.
