@@ -138,13 +138,14 @@ def find_minimizer(
                     to_be_minimized, p,
                     args=(x_unq, pdf_or_cdf, wgt, vtxvals, ipf, k_ipf),
                     method='Nelder-Mead',
+                    options={"maxiter":10000, "maxfev":10000}
                 )
                 k_ipf *= r_ipf
-                res_x = np.array(res.x)
+                p_est = np.array(res.x)
                 epsilon = ipf(x_unq, p_est) * k_ipf
                 # The following is necessary, epsilon can be < 0.
                 if epsilon < 0:
-                    return res_x, minimum, success, res
+                    return p_est, minimum, success, res
 
     except(RuntimeError, TypeError, NameError):
         pass
