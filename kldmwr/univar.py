@@ -140,7 +140,7 @@ def find_minimizer(
                     method='Nelder-Mead',
                 )
                 k_ipf *= r_ipf
-                p_est = np.array(res.x)
+                res_x = np.array(res.x)
                 epsilon = ipf(x_unq, p_est) * k_ipf
                 # The following is necessary, epsilon can be < 0.
                 if epsilon < 0:
