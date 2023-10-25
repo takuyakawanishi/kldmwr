@@ -15,6 +15,25 @@ def weights_zbc(counts):
     wz[1:] += counts
     return 0.5 * wz
 
+
+def weights_zbc_left(counts):
+    wz = np.zeros(len(counts) + 1)
+    wz[: -1] = counts
+    wz[1:] += counts
+    wz = 0.5 * wz
+    wz[-1] = wz[-1] + 0.5
+    return wz
+
+
+def weights_zbc_right(counts):
+    wz = np.zeros(len(counts) + 1)
+    wz[: -1] = counts
+    wz[1:] += counts
+    wz = 0.5 * wz
+    wz[0] = wz[0] + 0.5
+    return wz
+
+    
 # Depreciated
 # def weights_nbc(counts):
 #    wn = np.zeros(len(counts) + 1)
@@ -32,7 +51,10 @@ def weights_nbc(counts):
     wz[-1] = wz[-1] + 0.5
     return wz
 
+
+# For backward compatibility
 weights_nbc_2 = weights_nbc
+
 
 def calc_ls(p, x_unq, cdf, wgt, vtxvals):
     vtxvals[1: -1] = cdf(x_unq, p)
@@ -108,14 +130,18 @@ def find_minimizer(
     vtxvals = np.zeros(len(x_unq) + 2)
     vtxvals[-1] = 1.
     wgt = np.zeros(len(x_unq) + 1)
+
     if variant is 'zbc':
         wgt[:] = weights_zbc(cnt)
     elif variant is 'nbc':
-        wgt[:] = weights_nbc_2(cnt)
-        # wgt[:] = weights_nbc(cnt)
+        wgt[:] = weights_nbc(cnt)
     elif variant is 'ml':
         wgt = np.copy(cnt)
         vtxvals = np.zeros(len(x_unq))
+    elif variant is 'zbc_left':
+        wgt[:] = weights_zbc_left(cnt)
+    elif variant is 'zbc_right':
+        wgt[:] = weights_zbc_right(cnt)
 
     res = None
     res_x = np.empty(len(p))
@@ -147,9 +173,9 @@ def find_minimizer(
                 if epsilon < 0:
                     return p_est, minimum, success, res
 
-    except(RuntimeError, TypeError, NameError):
-        pass
-
+    except Exception as ex:
+        print(ex)
+        
     else:
         if res.success:
             est_input_same = False
@@ -236,8 +262,6 @@ def find_ge(x, p, cdf, ipf=None):
 #    wn[-1] = 1
 #    return wn
 
-
-
        (the array of estimated parameters, negative maximum product
        of spacings, boolean indicating success or not,
        the whole results of the scipy.optimize.minimize function)
@@ -278,6 +302,24 @@ def find_se(x, p, cdf, ipf=None):
     else:
         return find_minimizer(
             x, p, calc_gl_ipf, cdf, variant='nbc', ipf=ipf)
+
+
+def find_lzbce(x, p, cdf, ipf=None):
+    if ipf is None:
+        return find_minimizer(
+            x, p, calc_gl, cdf, variant='zbc_left')
+    else:
+        return find_minimizer(
+            x, p, calc_gl_ipf, cdf, variant='zbc_left', ipf=ipf)
+
+
+def find_rzbce(x, p, cdf, ipf=None):
+    if ipf is None:
+        return find_minimizer(
+            x, p, calc_gl, cdf, variant='zbc_right')
+    else:
+        return find_minimizer(
+            x, p, calc_gl_ipf, cdf, variant='zbc_right', ipf=ipf)
 
 
 def calc_mse(x, x_0):
@@ -363,7 +405,7 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
         minv = df.iloc[df['mmps'].idxmin(), :]
         res_x = []
         for i in range(len(p)):
-            res_x.append([minv['par_hat_' + str(i)]])
+            res_x.append(minv['par_hat_' + str(i)])
         res_x = np.array(res_x)
         minimum = minv['mmps']
         success = True
