@@ -1,7 +1,11 @@
 import unittest
 import numpy as np
-from kldmwr import univar
-from kldmwr.distributions import *
+# from kldmwr import univar
+# from kldmwr.distributions import *
+import sys
+sys.path.append("./")
+import inference.development_kldmwr.kldmwr.kldmwr.univar as univar
+from inference.development_kldmwr.kldmwr.kldmwr.distributions import *
 
 
 class TestUniverFinds(unittest.TestCase):
@@ -44,12 +48,13 @@ class TestUniverWeights(unittest.TestCase):
     def test_weights_zbc_left(self):
         w_zbc_left = univar.weights_zbc_left(self.cnt)
         w_zbc_left_expctd = [0.5, 1., 1.5, 1.5, 2., 2., 1]
-        np.testing.assert_equal(w_zbc, w_zbc_left_expctd)
+        np.testing.assert_equal(w_zbc_left, w_zbc_left_expctd)
 
-    def test_weights_zbc_left(self):
+    def test_weights_zbc_right(self):
         w_zbc_right = univar.weights_zbc_right(self.cnt)
         w_zbc_right_expctd = [1, 1., 1.5, 1.5, 2., 2., 0.5]
-        np.testing.assert_equal(w_zbc, w_zbc_right_expctd)
+        np.testing.assert_equal(w_zbc_right, w_zbc_right_expctd)
+
 
 class TestUniverCalcs(unittest.TestCase):
 
@@ -134,6 +139,7 @@ class TestUniverFindMinVivGEVMLE(unittest.TestCase):
         res = univar.find_min_viv(self.x, p_0, univar.find_mle, pdf)
         hat_p_expected = [0.92544841, 0.86717912, 1.20619691]
         minimum_expected = 20.667777025526618
+        print(res[0])
         np.testing.assert_almost_equal(res[0], hat_p_expected, decimal=4)
         np.testing.assert_almost_equal(res[1], minimum_expected, decimal=4)
 

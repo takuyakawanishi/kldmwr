@@ -131,23 +131,23 @@ def find_minimizer(
     vtxvals[-1] = 1.
     wgt = np.zeros(len(x_unq) + 1)
 
-    if variant is 'zbc':
+    if variant == 'zbc':
         wgt[:] = weights_zbc(cnt)
-    elif variant is 'nbc':
+    elif variant == 'nbc':
         wgt[:] = weights_nbc(cnt)
-    elif variant is 'ml':
+    elif variant == 'ml':
         wgt = np.copy(cnt)
         vtxvals = np.zeros(len(x_unq))
-    elif variant is 'zbc_left':
+    elif variant == 'zbc_left':
         wgt[:] = weights_zbc_left(cnt)
-    elif variant is 'zbc_right':
+    elif variant == 'zbc_right':
         wgt[:] = weights_zbc_right(cnt)
 
     res = None
     res_x = np.empty(len(p))
-    res_x[:] = np.NaN
+    res_x[:] = np.nan
     success = False
-    minimum = np.NaN
+    minimum = np.nan
     try:
         if ipf is None:
             res = scipy.optimize.minimize(
@@ -377,13 +377,15 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
     else:
         p_ints = p_ints
     res_x = np.empty(len(p))
-    res_x[:] = np.NaN
+    res_x[:] = np.nan
     success = False
-    minimum = np.NaN
+    minimum = np.nan
     df = None
     count = 0
     count_same = 0
+    count_fail = 0
     ress = []
+    df_columns = set_df_columns_min_viv(p)
     for p_int in p_ints:
         res = find_estimate(x, p_int, pdf_or_cdf, ipf)
         if res[2]:
@@ -392,22 +394,28 @@ def find_min_viv(x, p, find_estimate, pdf_or_cdf, p_ints=None, ipf=None):
             ress.append(contents)
             if 2 <= count:
                 if np.allclose(
-                        ress[count - 1][0:len(p)], ress[count - 2][0:len(p)], atol=1e-4):
+                        ress[count - 1][0:len(p)], ress[count - 2][0:len(p)],
+                        atol=1e-4):
                     count_same += 1
                 else:
                     count_same = 0
+        else:
+            count_fail += 1
+            row = np.empty(len(df_columns))
+            row[:] = np.nan
+            ress.append(row)
         if count_same >= 2:
             break
-
-    if count != 0:
-        df_columns = set_df_columns_min_viv(p)
+    if count > 0:
         df = pd.DataFrame(ress, columns=df_columns)
-        minv = df.iloc[df['mmps'].idxmin(), :]
-        res_x = []
+        idx_min = df[['mmps']].idxmin()
+        idx_pars = []
         for i in range(len(p)):
-            res_x.append(minv['par_hat_' + str(i)])
-        res_x = np.array(res_x)
-        minimum = minv['mmps']
+            idx_pars.append("par_hat_" + str(i))
+        res_x = df.loc[idx_min, idx_pars].to_numpy()[0]
+        # print("======== univar")
+        # print(res_x)
+        minimum = df.loc[idx_min, 'mmps'].to_numpy()[0]
         success = True
 
     return res_x, minimum, success, df

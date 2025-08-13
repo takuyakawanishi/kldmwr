@@ -1,7 +1,10 @@
 import unittest
 import numpy as np
-from kldmwr import distributions
-from kldmwr import gev
+import sys
+sys.path.append("./")
+import inference.development_kldmwr.kldmwr.kldmwr.univar as univar
+from inference.development_kldmwr.kldmwr.kldmwr import distributions
+from inference.development_kldmwr.kldmwr.kldmwr import gev
 
 
 class TestCalcDerivativesOfh(unittest.TestCase):

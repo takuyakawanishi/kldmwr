@@ -26,6 +26,7 @@ LWPT = .8  # Line width for plot (thick)
 
 
 def color_pallet_cud():
+
     cud = {
         'red': (255 / 255, 75 / 255, 0),
         'yellow': (255 / 255, 241 / 255, 0),
@@ -89,9 +90,9 @@ def set_figure_dimensions_in_points():
     """
     dimensions = {
         'wom': 0,  # Width of outer margin
-        'hom': 0,  # Width of outer margin
+        'hom': 0,  # Height of outer margin
         'wfm': 4,  # Width of figure margin
-        'hfm': 4,
+        'hfm': 4,  # Height of figure margin
         'wpg': 4,  # Width of panel gap
         'hpg': 4,
         'ws': 72,
@@ -103,7 +104,7 @@ def set_figure_dimensions_in_points():
         'wsp': 0,
         'hsp': 0,
         'wfg': 8,  # Width of figure gap
-        'hfg': 8,  # Height of panel gap
+        'hfg': 8,  # Height of figure gap
     }
     dimensions['wl'] = dimensions['wyl'] + dimensions['wtl']
     dimensions['hl'] = dimensions['hxl'] + dimensions['htl']
@@ -350,7 +351,7 @@ class TFigure(object):
                     direction='out', labelsize=FSTL)
 
                 nvp_figi = self.n_panels_vertical[i]
-                ihor = np.int(i_ax / nvp_figi)
+                ihor = int(i_ax / nvp_figi)
                 ivar = np.mod(i_ax, nvp_figi)
                 vis_x = self.show_xaxis_label_ticks_figs[i, ivar, 1]
                 vis_y = self.show_yaxis_label_ticks_figs[i, ihor, 1]
@@ -366,7 +367,7 @@ class TFigure(object):
             for i_ax, ax in enumerate(self.axs[i]):
                 nvp_figi = self.n_panels_vertical[i]
                 nhp_figi = self.n_panels_horizontal[i]
-                ihor = np.int(i_ax / nvp_figi)
+                ihor = int(i_ax / nvp_figi)
                 ivar = np.mod(i_ax, nvp_figi)
                 ax.xaxis.set_visible(
                     self.show_xaxis_label_ticks_figs[i, ivar, 1]
